@@ -1,0 +1,12 @@
+9c96f6fa752e4221bda825cdb6ffc7f0 *DESCRIPTION
+25310a126424fad79ee885654da2e7cd *LICENSE
+df390c53434517b304ac5db487184641 *NAMESPACE
+dc3d9eeb63b9f771aac209bb209cf569 *NEWS.md
+4a8d7f307dda2767b6333f6d06b35f75 *R/read_flights.R
+dc56c538249f4d6058bab72beed7a042 *README.md
+10d5ee06ea83eb510cd5cebaeb88fd89 *build/vignette.rds
+4a1475f54125e8c9fbebcecf8a53bf15 *inst/doc/flightsbr.R
+d4df171d7cf1720e29befc798b80e304 *inst/doc/flightsbr.Rmd
+f9446eab4dddee0efd471f9b350690cd *inst/doc/flightsbr.html
+4d3bf1ecd69a55a2a6c6b36ff8864903 *man/read_flights.Rd
+d4df171d7cf1720e29befc798b80e304 *vignettes/flightsbr.Rmd
