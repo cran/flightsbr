@@ -4,23 +4,30 @@
 \alias{read_flights}
 \title{Download flight data from Brazil}
 \usage{
-read_flights(year = 2020, month = 1, type = "basica", showProgress = TRUE)
+read_flights(
+  date = 202001,
+  type = "basica",
+  showProgress = TRUE,
+  select = NULL
+)
 }
 \arguments{
-\item{year}{Numeric. Year of the data. Defaults to \code{2010}}
-
-\item{month}{Numeric. Year of the data. Defaults to \code{1} (January)}
+\item{date}{Numeric. Date of the data in the format \code{yyyymm}. Defaults to
+\code{202001}. To download the data for all months in a year, the user
+can pass a 4-digit year input \code{yyyy}.}
 
 \item{type}{String. Whether the data set should be of the type \code{basica}
-(flight stage, the default) or \code{combinada} (On flight origin and destination
-\itemize{
-\item OFOD).
-}}
+(flight stage, the default) or \code{combinada} (On flight origin and
+destination - OFOD).}
 
-\item{showProgress}{Logical. Defaults to \code{TRUE} display progress bar}
+\item{showProgress}{Logical. Defaults to \code{TRUE} display progress.}
+
+\item{select}{A vector of column names or numbers to keep, drop the rest. The
+order that the columns are specified determines the order of the
+columns in the result.}
 }
 \value{
-A \verb{"data.table" "data.frame"} object
+A \verb{"data.table" "data.frame"} object.
 }
 \description{
 Download flight data from Brazil’s Civil Aviation Agency (ANAC). The data
@@ -33,7 +40,13 @@ description of all variables included in the data is available at \url{https://w
 \examples{
 \dontrun{ if (interactive()) {
 # Read flights data
-a201506 <- read_flights(year=2015, month=6)
+f201506 <- read_flights(date = 201506)
+
+f2015 <- read_flights(date = 2015)
 }}
+}
+\seealso{
+Other download flight data: 
+\code{\link{read_aircrafts}()}
 }
 \concept{download flight data}

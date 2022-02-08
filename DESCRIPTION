@@ -1,7 +1,8 @@
 Type: Package
 Package: flightsbr
-Title: Download Flight Data from Brazil
-Version: 0.0.1
+Title: Download Flight and Airport Data from Brazil
+Version: 0.1.0
+Date: 2022-02-08
 Authors@R: 
     c(person(given="Rafael H. M.", family="Pereira", 
              email="rafa.pereira.br@gmail.com", 
@@ -9,24 +10,27 @@ Authors@R:
              comment = c(ORCID = "0000-0003-2125-7465")),
       person(given = "Ipea - Institute for Applied Economic Research",
              role = c("cph", "fnd")))
-Description: Download flight data from Brazil’s Civil Aviation Agency (ANAC)
-             <https://www.gov.br/anac/pt-br>. The data includes detailed 
-             information on every international flight to and from Brazil, 
-             as well as domestic flights within the country.
+Description: Download flight and airport data from Brazil’s Civil Aviation Agency
+             (ANAC) <https://www.gov.br/anac>. The data includes detailed 
+             information on all aircrafts, aerodromes, airports, and airports 
+             movements registered in ANAC, and on every international flight to
+             and from Brazil, as well as domestic flights within the country.
 License: MIT + file LICENSE
 URL: https://github.com/ipeaGIT/flightsbr
 BugReports: https://github.com/ipeaGIT/flightsbr/issues
 Depends: R (>= 2.10)
-Imports: data.table, httr (>= 1.4.1)
-Suggests: ggplot2 (>= 3.3.1), rmarkdown (>= 2.6), knitr
+Imports: data.table (>= 1.14.0), httr (>= 1.4.1), parzer, pbapply,
+        rvest
+Suggests: dplyr, ggplot2 (>= 3.3.1), rmarkdown (>= 2.6), knitr,
+        testthat
 VignetteBuilder: knitr
 Encoding: UTF-8
 NeedsCompilation: yes
 RoxygenNote: 7.1.2
-Packaged: 2022-01-20 18:48:38 UTC; user
+Packaged: 2022-02-08 12:23:57 UTC; user
 Author: Rafael H. M. Pereira [aut, cre]
     (<https://orcid.org/0000-0003-2125-7465>),
   Ipea - Institute for Applied Economic Research [cph, fnd]
 Maintainer: Rafael H. M. Pereira <rafa.pereira.br@gmail.com>
 Repository: CRAN
-Date/Publication: 2022-01-21 09:12:53 UTC
+Date/Publication: 2022-02-08 15:20:02 UTC
