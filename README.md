@@ -1,4 +1,4 @@
-# flightsbr: Download Flight And Airport Data from Brazil <img align="right" src="man/figures/logo.png?raw=true" alt="logo" width="180">
+# flightsbr: Download Flight and Airport Data from Brazil <img align="right" src="man/figures/logo.png?raw=true" alt="logo" width="180">
 
 [![CRAN
    status](https://www.r-pkg.org/badges/version/flightsbr)](https://CRAN.R-project.org/package=flightsbr)
@@ -9,9 +9,9 @@
    downloads](http://cranlogs.r-pkg.org/badges/grand-total/flightsbr?color=yellow)](https://CRAN.R-project.org/package=flightsbr)
 [![Codecov test
 coverage](https://codecov.io/gh/ipeaGIT/flightsbr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/flightsbr?branch=main)
+[![DOI](https://img.shields.io/badge/DOI-10.31219%2Fosf.io%2Fjdv7u-blue)](https://doi.org/10.31219/osf.io/jdv7u)
 
-
-**flightsbr** is a R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The data includes detailed information on all aircrafts, aerodromes, airports, and airports movements registered in ANAC, and on every international flight to and from Brazil, as well as domestic flights within the country.
+**flightsbr** is a R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The data includes detailed information on all aircrafts, airports, and airport movements registered in ANAC, and on every international flight to and from Brazil, as well as domestic flights within the country.
 
 
 ## Installation
@@ -69,5 +69,5 @@ airport_ops <- flightsbr::read_airport_movements(date = 202001)
 
 Original data is collected by [Brazil’s Civil Aviation Agency (ANAC)](https://www.gov.br/anac/pt-br). The **flightsbr** package is developed by a team at the Institute for Applied Economic Research (Ipea), Brazil. If you want to cite this package, you can cite it as:
 
-* Pereira, R.H.M. (2022) **flightsbr: Download Flight Data from Brazil**. GitHub repository - https://github.com/ipeaGIT/flightsbr.
+* Pereira, R.H.M. (2022) **flightsbr: Download Flight and Airport Data from Brazil**. GitHub repository - https://github.com/ipeaGIT/flightsbr.
 

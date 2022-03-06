@@ -1,33 +1,7 @@
-# nocov start
-
-
-#' Split a date from yyyymmm to year yyyy and month mm
-#'
-#' @description Split a date from yyyymmm to year yyyy and month mm.
-#'
-#' @param date Numeric. Date of the data in `yyyymm` format.
-#'
-#' @return An two string objects, `year` and `month`.
-#' @keywords internal
-#' @examples \dontrun{ if (interactive()) {
-#' # Read flights data
-#' a <- split_date(200011)
-#'}}
-split_date <- function(date) {
-
-  y <- m <- NULL
-  y <- substring(date, 1,4)
-  m <- substring(date, 5,6)
-
-  newList <- list("year" = y,
-                  "month" = m)
-  list2env(newList ,.GlobalEnv)
-}
-
-
 #' Retrieve from ANAC website all dates available for flights data
 #'
 #' @return Numeric vector.
+#' @export
 #' @keywords internal
 #' @examples \dontrun{ if (interactive()) {
 #' # check dates
@@ -40,9 +14,9 @@ get_flight_dates_available <- function() {
   h <- try(rvest::read_html(url), silent = TRUE)
 
   # check if internet connection worked
-  if (class(h)[1]=='try-error') {
-    message("Problem connecting to ANAC data server")
-    return(invisible(NULL))
+  if (class(h)[1]=='try-error') {                                           #nocov
+    message("Problem connecting to ANAC data server. Please try it again.") #nocov
+    return(invisible(NULL))                                                 #nocov
   }
 
   # filter elements of basica data
@@ -58,184 +32,6 @@ get_flight_dates_available <- function() {
 }
 
 
-#' Check whether date input is acceptable
-#' @param date Numeric. Either a 6-digit date in the format `yyyymm` or a 4-digit
-#'             date input `yyyy` .
-#' @param all_dates Numeric vector created with the get_all_dates_available() function.
-#'
-#' @return Check messages.
-#' @keywords internal
-#' @examples \dontrun{ if (interactive()) {
-#'
-#' # get all dates available
-#' all_dates <- get_all_dates_available()
-#'
-#' # check dates
-#' a <- check_date(200011, all_dates)
-#'}}
-check_date <- function(date, all_dates) {
-
-  if (nchar(date)==6) {
-    if (!(date %in% all_dates)) {stop(paste0("Data only available for dates between ", min(all_dates), " and ", max(all_dates), "."))}
-    }
-
-  if (nchar(date)!=6) {
-    if (!(date %in% 2000:2021)) {stop(paste0("Data only available for dates between ", min(all_dates), " and ", max(all_dates), "."))}
-    }
-}
-
-
-
-
-#' Generate all months with `yyyymm` format in a year
-#'
-#' @param date Numeric. 4-digit date in the format `yyyy`.
-#' @return Vector or strings.
-#' @keywords internal
-#' @examples \dontrun{ if (interactive()) {
-#' # Generate all months in 2000
-#' a <- check_date(2000)
-#'}}
-generate_all_months <- function(date) {
-
-  # check
-  if( nchar(date)!=4 ){ stop(paste0("Argument 'date' must be 4-digit in the format `yyyy`.")) }
-
-  jan <- as.numeric(paste0(date, '01'))
-  dec <- as.numeric(paste0(date, '12'))
-  all_months <- jan:dec
-  return(all_months)
-}
-
-
-
-#' Put together the url of flight data files
-#'
-#' @param year Numeric. Year of the data in `yyyy` format.
-#' @param month Numeric. Month of the data in `mm` format.
-#' @param type String. Whether the data set should be of the type `basica`
-#'             (flight stage, the default) or `combinada` (On flight origin and
-#'             destination - OFOD).
-#'
-#' @return A url string.
-#'
-#' @keywords internal
-#' @examples \dontrun{ if (interactive()) {
-#' # Generate url
-#' a <- get_flights_url(type='basica', year=2000, month=11)
-#'}}
-get_flights_url <- function(type, year, month) {
-
-  # https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/envio-de-informacoes/microdados/basica2021-01.zip
-
-  if( nchar(month) ==1 ) { month <- paste0('0', month)}
-
-  url_root <- 'https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/envio-de-informacoes/microdados/'
-  file_name <- paste0(type, year, '-', month, '.zip')
-  file_url <- paste0(url_root, file_name)
-  return(file_url)
-}
-
-
-
-#' Download and read ANAC flight data
-#'
-#' @param file_url String. A url passed from get_flights_url.
-#' @param showProgress Logical, passed from \code{\link{read_flights}}
-#' @param select A vector of column names or numbers to keep, passed from \code{\link{read_flights}}
-#'
-#' @return A `"data.table" "data.frame"` object
-#'
-#' @keywords internal
-#' @examples \dontrun{ if (interactive()) {
-#' # Generate url
-#' file_url <- get_flights_url(type='basica', year=2000, month=11)
-#'
-#' # download data
-#' a <- download_flights_data(file_url=file_url, showProgress=TRUE, select=NULL)
-#'}}
-download_flights_data <- function(file_url, showProgress=showProgress, select=select){
-
-  # create temp local file
-  file_name <- substr(file_url, (nchar(file_url) + 1) -17, nchar(file_url) )
-  temp_local_file <- tempfile( file_name )
-
-  # download data
-  try(
-    httr::GET(url=file_url,
-              if(showProgress==T){ httr::progress()},
-              httr::write_disk(temp_local_file, overwrite = T),
-              config = httr::config(ssl_verifypeer = FALSE)
-    ), silent = TRUE)
-
-  # address of zipped file stored locally
-  temp_local_file_zip <- paste0('unzip -p ', temp_local_file)
-
-  # check if file has been downloaded
-  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
-        message('Internet connection not working.')
-        return(invisible(NULL)) }
-
-  ### set threads for fread
-  orig_threads <- data.table::getDTthreads()
-  data.table::setDTthreads(percent = 100)
-
-  # read zipped file stored locally
-  dt <- data.table::fread( cmd =  temp_local_file_zip, select=select)
-
-  # return to original threads
-  data.table::setDTthreads(orig_threads)
-
-  return(dt)
-  }
-
-
-#' Convert latitude and longitude columns to numeric
-#'
-#' @param df A data.frame internal to the `read_airport()` function.
-#' @param colname String. Either `LATITUTE` or `LONGITUDE`.
-#'
-#' @return A `"data.table" "data.frame"` object
-#'
-#' @keywords internal
-latlon_to_numeric <- function(df, colname){
-
-  # https://semba-blog.netlify.app/02/25/2020/geographical-coordinates-conversion-made-easy-with-parzer-package-in-r/
-
-  # # create column identifying whether coordinates in the South or West
-  # df$south_west <- data.table::fifelse( data.table::like(df[[colname]], 'S|W' ), -1, 1)
-
-  # get vector
-  vec <- df[[colname]]
-
-  # # fix string
-  # vec <- gsub("[W|S]", "", vec) # remove text
-  vec <- gsub("[\u00c2]", "", vec) # remove special characters Â
-
-  if(colname=='latitude'){
-                  df[[colname]] <- parzer::parse_lat(vec)
-                  }
-
-  if(colname=='longitude'){
-    df[[colname]] <- parzer::parse_lon(vec)
-  }
-
-  # # fix string
-  # vec <- gsub("[.]", "", vec) # replace any decimal markers
-  # vec <- gsub("[\ub0]", ".", vec) # replace the degree symbol ° with a point '.'
-  # vec <- gsub("[^0-9.-]", "", vec) # keep only numeric
-  #
-  # # convert to numeric
-  # df[[colname]] <- as.numeric(vec) * df$south_west
-  # df$south_west <- NULL
-
-  return(df)
-}
-
-
-
-
-
 #' Retrieve all dates available for airport movements data
 #'
 #' @description
@@ -246,6 +42,7 @@ latlon_to_numeric <- function(df, colname){
 #'             retrieves information for all years available.
 #'
 #' @return Numeric vector.
+#' @export
 #' @keywords internal
 #' @examples \dontrun{ if (interactive()) {
 #' # check dates
@@ -270,7 +67,12 @@ get_airport_movement_dates_available <- function(date=NULL) {
   urls <- paste0(base_url, years)
 
   ## check date input
+
   if (!is.null(date)) {
+
+    # check length
+    if ( ! nchar(date) %in% c(4,6)) {stop("Date has to be either `NULL` or a 4- or 6-digit number `yyyymm`")}
+
     # get year and month
     yyyy <- substr(date, 1, 4)
     if (nchar(date)==6) { mm <- substr(date, 5, 6) }
@@ -318,8 +120,184 @@ get_airport_movement_dates_available <- function(date=NULL) {
 }
 
 
+#' Check whether date input is acceptable
+#' @param date Numeric. Either a 6-digit date in the format `yyyymm` or a 4-digit
+#'             date input `yyyy` .
+#' @param all_dates Numeric vector created with the get_all_dates_available() function.
+#'
+#' @return Check messages.
+#' @export
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#'
+#' # get all dates available
+#' all_dates <- get_all_dates_available()
+#'
+#' # check dates
+#' a <- check_date(200011, all_dates)
+#'}}
+check_date <- function(date, all_dates) {
+
+  if (nchar(date)==6) {
+    if (!(date %in% all_dates)) {stop(paste0("So far, the data is only available for dates between ", min(all_dates), " and ", max(all_dates), "."))}
+    }
+
+  if (nchar(date)!=6) {
+    if (!(date %in% 2000:2021)) {stop(paste0("So far, the data is only available for dates between ", min(all_dates), " and ", max(all_dates), "."))}
+    }
+}
 
 
+
+#' Generate all months with `yyyymm` format in a year
+#'
+#' @param date Numeric. 4-digit date in the format `yyyy`.
+#' @return Vector or strings.
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # Generate all months in 2000
+#' a <- check_date(2000)
+#'}}
+generate_all_months <- function(date) { # nocov start
+
+  # check
+  if( nchar(date)!=4 ){ stop(paste0("Argument 'date' must be 4-digit in the format `yyyy`.")) }
+
+  jan <- as.numeric(paste0(date, '01'))
+  dec <- as.numeric(paste0(date, '12'))
+  all_months <- jan:dec
+  return(all_months)
+} # nocov end
+
+
+
+#' Put together the url of flight data files
+#'
+#' @param year Numeric. Year of the data in `yyyy` format.
+#' @param month Numeric. Month of the data in `mm` format.
+#' @param type String. Whether the data set should be of the type `basica`
+#'             (flight stage, the default) or `combinada` (On flight origin and
+#'             destination - OFOD).
+#'
+#' @return A url string.
+#'
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # Generate url
+#' a <- get_flights_url(type='basica', year=2000, month=11)
+#'}}
+get_flights_url <- function(type, year, month) { # nocov start
+
+  # https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/envio-de-informacoes/microdados/basica2021-01.zip
+
+  if( nchar(month) ==1 ) { month <- paste0('0', month)}
+
+  url_root <- 'https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/envio-de-informacoes/microdados/'
+  file_name <- paste0(type, year, '-', month, '.zip')
+  file_url <- paste0(url_root, file_name)
+  return(file_url)
+} # nocov end
+
+
+
+#' Download and read ANAC flight data
+#'
+#' @param file_url String. A url passed from get_flights_url.
+#' @param showProgress Logical, passed from \code{\link{read_flights}}
+#' @param select A vector of column names or numbers to keep, passed from \code{\link{read_flights}}
+#'
+#' @return A `"data.table" "data.frame"` object
+#'
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # Generate url
+#' file_url <- get_flights_url(type='basica', year=2000, month=11)
+#'
+#' # download data
+#' a <- download_flights_data(file_url=file_url, showProgress=TRUE, select=NULL)
+#'}}
+download_flights_data <- function(file_url, showProgress=showProgress, select=select){ # nocov start
+
+  # create temp local file
+  # file_name <- substr(file_url, (nchar(file_url) + 1) -17, nchar(file_url) )
+  file_name <- basename(file_url)
+  temp_local_file <- tempfile( file_name )
+
+  # download data
+  try(
+    httr::GET(url=file_url,
+              if(showProgress==T){ httr::progress()},
+              httr::write_disk(temp_local_file, overwrite = T),
+              config = httr::config(ssl_verifypeer = FALSE)
+    ), silent = TRUE)
+
+  # address of zipped file stored locally
+  temp_local_file_zip <- paste0('unzip -p ', temp_local_file)
+
+  # check if file has been downloaded, try a 2nd time
+    if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+
+            # download data: try a 2nd time
+            try(
+              httr::GET(url=file_url,
+                        if(showProgress==T){ httr::progress()},
+                        httr::write_disk(temp_local_file, overwrite = T),
+                        config = httr::config(ssl_verifypeer = FALSE)
+              ), silent = TRUE)
+      }
+
+  # check if file has been downloaded
+  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+        message('Internet connection not working.')
+        return(invisible(NULL)) }
+
+  ### set threads for fread
+  orig_threads <- data.table::getDTthreads()
+  data.table::setDTthreads(percent = 100)
+
+  # read zipped file stored locally
+  dt <- data.table::fread( cmd =  temp_local_file_zip, select=select)
+
+  # return to original threads
+  data.table::setDTthreads(orig_threads)
+
+  return(dt)
+  } # nocov end
+
+
+#' Convert latitude and longitude columns to numeric
+#'
+#' @param df A data.frame internal to the `read_airport()` function.
+#'
+#' @return A `"data.table" "data.frame"` object
+#'
+#' @keywords internal
+latlon_to_numeric <- function(df){ # nocov start
+
+  # check if df has lat lon colnames
+  if(!'latitude' %in% names(df)){ stop("Column 'latitude' is missing from original ANAC data.") }
+  if(!'longitude' %in% names(df)){ stop("Column 'longitude' is missing from original ANAC data.") }
+
+  # ref
+  # https://semba-blog.netlify.app/02/25/2020/geographical-coordinates-conversion-made-easy-with-parzer-package-in-r/
+
+  # supress warning
+  defaultW <- getOption("warn")
+  options(warn = -1)
+
+  # fix string
+  df[, latitude := gsub("[\u00c2]", "", latitude) ]
+  df[, longitude := gsub("[\u00c2]", "", longitude) ]
+
+  # convert to numeric
+  df[, latitude := parzer::parse_lat(latitude) ]
+  df[, longitude := parzer::parse_lon(longitude) ]
+
+  # restore warnings
+  options(warn = defaultW)
+
+  return(df)
+} # nocov end
 
 
 
@@ -337,7 +315,7 @@ get_airport_movement_dates_available <- function(date=NULL) {
 #' # Generate url
 #' a <- get_flights_url(type='basica', year=2000, month=11)
 #'}}
-get_airport_movements_url <- function(year, month) {
+get_airport_movements_url <- function(year, month) { # nocov start
 
   if( nchar(month) ==1 ) { month <- paste0('0', month)}
 
@@ -346,7 +324,7 @@ get_airport_movements_url <- function(year, month) {
   file_name <- paste0(year, '/', 'Movimentacoes_Aeroportuarias_', year, month, '.csv')
   file_url <- paste0(url_root, file_name)
   return(file_url)
-}
+} # nocov end
 
 
 
@@ -366,10 +344,12 @@ get_airport_movements_url <- function(year, month) {
 #' # download data
 #' a <- download_airport_movement_data(file_url=file_url, showProgress=TRUE)
 #'}}
-download_airport_movement_data <- function(file_url, showProgress=showProgress){
+download_airport_movement_data <- function(file_url, showProgress=showProgress){ # nocov start
 
   # create temp local file
-  file_name <- substr(file_url, (nchar(file_url) + 1) -17, nchar(file_url) )
+  # file_name <- substr(file_url, (nchar(file_url) + 1) -17, nchar(file_url) )
+  file_name <- basename(file_url)
+
   temp_local_file <- tempfile( file_name )
 
   ### set threads for fread
@@ -378,6 +358,11 @@ download_airport_movement_data <- function(file_url, showProgress=showProgress){
 
   # download data and read .csv data file
   dt <- try( data.table::fread(file_url, showProgress = showProgress), silent = TRUE)
+
+    # check if file has been downloaded, try a 2nd time
+    if (class(dt)[1]=='try-error') {
+      dt <- try( data.table::fread(file_url, showProgress = showProgress), silent = TRUE)
+      }
 
   # return to original threads
   data.table::setDTthreads(orig_threads)
@@ -389,6 +374,4 @@ download_airport_movement_data <- function(file_url, showProgress=showProgress){
   }
 
   return(dt)
-}
-
-# nocov end
+} # nocov end

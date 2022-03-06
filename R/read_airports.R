@@ -41,21 +41,31 @@ read_airports <- function(type = 'all', showProgress = TRUE){
 if (any(type %in% c('public', 'all'))){
 
   ### set threads for fread
-  orig_threads <- data.table::getDTthreads()
-  data.table::setDTthreads(percent = 100)
+  orig_threads <- data.table::getDTthreads() # nocov
+  data.table::setDTthreads(percent = 100)  # nocov
 
+  # download and read data
   dt_public <- try(silent=T,
                    data.table::fread(url_public,
-                                     skip = 2,
+                                     skip = 1,
                                        encoding = 'UTF-8',
                                      showProgress=showProgress))
 
+    # check if download succeeded, try a 2nd time
+    if (class(dt_public)[1]=="try-error") { # nocov start
+      dt_public <- try(silent=T,
+                       data.table::fread(url_public,
+                                         skip = 1,
+                                         encoding = 'UTF-8',
+                                         showProgress=showProgress))
+      } # nocov end
+
   # return to original threads
-  data.table::setDTthreads(orig_threads)
+  data.table::setDTthreads(orig_threads)  # nocov
 
   # check if download succeeded
   if (class(dt_public)[1]=="try-error") {
-                          message('Internet connection not working.')
+                          message('Internet connection not working.')  # nocov
                           return(invisible(NULL)) }
 
   # fix column names to lower case
@@ -65,9 +75,7 @@ if (any(type %in% c('public', 'all'))){
   dt_public <- dt_public[-1,]
 
   # fix geographical coordinates
-  dt_public <- latlon_to_numeric(df = dt_public, colname = 'latitude')
-  dt_public <- latlon_to_numeric(df = dt_public, colname = 'longitude')
-  # dt_public[, latitude := parzer::parse_lat(latitude) ]
+  latlon_to_numeric(dt_public)
 
   # add type info
    data.table::setDT(dt_public)[, type := 'public']
@@ -82,11 +90,22 @@ if (any(type %in% c('private', 'all'))){
   orig_threads <- data.table::getDTthreads()
   data.table::setDTthreads(percent = 100)
 
+  # download and read data
   dt_private <- try(silent=T,
                     data.table::fread(url_private,
                                       skip = 1,
                                       # encoding = 'Latin-1',
                                       showProgress=showProgress))
+
+    # check if download succeeded, try a 2nd time
+    if (class(dt_private)[1]=="try-error") {  # nocov start
+      dt_private <- try(silent=T,
+                        data.table::fread(url_private,
+                                          skip = 1,
+                                          # encoding = 'Latin-1',
+                                          showProgress=showProgress))
+      }  # nocov end
+
 
   # return to original threads
   data.table::setDTthreads(orig_threads)
@@ -101,10 +120,7 @@ if (any(type %in% c('private', 'all'))){
   data.table::setnames(dt_private, tolower(prv_names))
 
   # fix geographical coordinates
-  dt_private <- latlon_to_numeric(df = dt_private, colname = 'latitude')
-  dt_private <- latlon_to_numeric(df = dt_private, colname = 'longitude')
-  # dt_private[, latitude := parzer::parse_lat(latitude) ]
-  # dt_private[, longitude := parzer::parse_lat(longitude) ]
+  latlon_to_numeric(dt_private)
 
   # add type info
    data.table::setDT(dt_private)[, type := 'private']
