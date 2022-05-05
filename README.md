@@ -11,7 +11,7 @@
 coverage](https://codecov.io/gh/ipeaGIT/flightsbr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/flightsbr?branch=main)
 [![DOI](https://img.shields.io/badge/DOI-10.31219%2Fosf.io%2Fjdv7u-blue)](https://doi.org/10.31219/osf.io/jdv7u)
 
-**flightsbr** is a R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The data includes detailed information on all aircrafts, airports, and airport movements registered in ANAC, and on every international flight to and from Brazil, as well as domestic flights within the country.
+**flightsbr** is a R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The data includes detailed information on all aircrafts, airports, and airport movements registered in ANAC, on airfares and on every international flight to and from Brazil, as well as domestic flights within the country.
 
 
 ## Installation
@@ -27,12 +27,14 @@ coverage](https://codecov.io/gh/ipeaGIT/flightsbr/branch/main/graph/badge.svg)](
 
 
 ## Basic usage
-The package currently includes [four main functions](https://ipeagit.github.io/flightsbr/reference/index.html):
+The package currently includes [five main functions](https://ipeagit.github.io/flightsbr/reference/index.html):
 
 1. `read_flights()`
 2. `read_airports()`
 3. `read_aircrafts()`
 4. `read_airport_movements()`
+5. `read_airfares()`
+
 
 #### 1) `read_flights()` to download data on national and international flights.
 ```
@@ -63,8 +65,15 @@ aircrafts <- flightsbr::read_aircrafts()
 airport_ops <- flightsbr::read_airport_movements(date = 202001)
 ```
 
+#### 5) `read_airfares()` to download data on airfares of domestic or internatinoal flights.
+```
+airfares <- flightsbr::read_airfares(date = 202001, domestic = TRUE)
+
+```
 
 #### **Related projects**
+
+- [openSkies: a client interface to the 'OpenSky' API](https://github.com/Rafael-Ayala/openSkies)
 
 As of today, there are two repositories/projects with Brazilian aviation data, which include more info related to weather conditions, air traffic management etc. The advantage of **flightsbt** is that it's the easiest and fastest way to download flight and airport Data from Brazil in `R`.
 

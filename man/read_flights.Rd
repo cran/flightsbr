@@ -27,7 +27,8 @@ order that the columns are specified determines the order of the
 columns in the result.}
 }
 \value{
-A \verb{"data.table" "data.frame"} object.
+A \verb{"data.table" "data.frame"} object. All columns are returned with
+\code{class} of type \code{"character"}.
 }
 \description{
 Download flight data from Brazil’s Civil Aviation Agency (ANAC). The data
@@ -35,7 +36,7 @@ includes detailed information on every international flight to and from Brazil,
 as well as domestic flights within the country. The data include flight-level
 information of airports of origin and destination, flight duration, aircraft
 type, payload, and the number of passengers, and several other variables. A
-description of all variables included in the data is available at \url{https://www.anac.gov.br/assuntos/setor-regulado/empresas/envio-de-informacoes/descricao-de-variaveis}.
+description of all variables included in the data is available at \url{https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/Instrucoes-para-a-elaboracao-e-apresentacao-das-demonstracoes-contabeis/descricao-de-variaveis}.
 }
 \examples{
 \dontrun{ if (interactive()) {

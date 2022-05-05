@@ -37,3 +37,8 @@ knitr::opts_chunk$set(
 #  
 #  head(airport_mov)
 
+## ---- eval=FALSE--------------------------------------------------------------
+#  airfares <- flightsbr::read_airfares(date=202003, domestic = TRUE)
+#  
+#  head(airfares)
+

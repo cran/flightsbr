@@ -141,16 +141,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<p><strong>flightsbr</strong> is an R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The package currently includes four main functions:</p>
+<p><strong>flightsbr</strong> is an R package to download flight and airport data from Brazil’s Civil Aviation Agency (ANAC). The package currently includes five main functions:</p>
 <ol style="list-style-type: decimal">
 <li><code>read_flights()</code></li>
 <li><code>read_airports()</code></li>
 <li><code>read_aircrafts()</code></li>
 <li><code>read_airport_movements()</code></li>
+<li><code>read_airfares()</code></li>
 </ol>
 <div id="read_flights" class="section level3">
 <h3>1) <code>read_flights()</code>:</h3>
-<p>Flights data include detailed information on every international flight to and from Brazil, as well as domestic flights within the country. The data include flight-level information of airports of origin and destination, flight duration, aircraft type, payload, and the number of passengers, and several other variables. - <a href="https://www.anac.gov.br/assuntos/setor-regulado/empresas/envio-de-informacoes/descricao-de-variaveis">Data dictionary for flights</a>.</p>
+<p>Flights data include detailed information on every international flight to and from Brazil, as well as domestic flights within the country. The data include flight-level information of airports of origin and destination, flight duration, aircraft type, payload, and the number of passengers, and several other variables. - <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/Instrucoes-para-a-elaboracao-e-apresentacao-das-demonstracoes-contabeis/descricao-de-variaveis">Data dictionary for flights</a>.</p>
 </div>
 <div id="read_airports" class="section level3">
 <h3>2) <code>read_airports()</code></h3>
@@ -170,6 +171,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="read_airport_movements" class="section level3">
 <h3>4) <code>read_airport_movements()</code>:</h3>
 <p>The data covers all passenger, aircraft, cargo and mail movement from airports regulated by ANAC. - <a href="https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/operador-aeroportuario-dados-de-movimentacao-aeroportuaria/metadados-do-conjunto-de-dados-dados-de-movimentacao-aeroportuaria">Data dictionary for airport movements data</a>.</p>
+</div>
+<div id="read_airfares" class="section level3">
+<h3>5) <code>read_airfares()</code>:</h3>
+<p>The data covers airfares of domestic and international flights.</p>
+<ul>
+<li>Data dictionary:
+<ul>
+<li><a href="https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/voos-e-operacoes-aereas/tarifas-aereas-domesticas/46-tarifas-aereas-domesticas">domestic airfares</a>.</li>
+<li><a href="https://www.gov.br/anac/pt-br/assuntos/dados-e-estatisticas/microdados-de-tarifas-aereas-comercializadas">international airfares</a>.</li>
+</ul></li>
+</ul>
 </div>
 <div id="basic-usage" class="section level2">
 <h2>Basic usage</h2>
@@ -204,6 +216,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>airport_mov <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airport_movements</span>(<span class="at">date=</span><span class="dv">201901</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(airport_mov)</span></code></pre></div>
+</div>
+<div id="download-data-on-data-on-air-fares-of-domestic-flights-in-brazil" class="section level4">
+<h4>Download data on data on air fares of domestic flights in Brazil:</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>airfares <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airfares</span>(<span class="at">date=</span><span class="dv">202003</span>, <span class="at">domestic =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(airfares)</span></code></pre></div>
 </div>
 </div>
 
