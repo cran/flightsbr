@@ -27,6 +27,16 @@ get_flight_dates_available <- function() {
   # get all dates available
   all_dates <- substr(basica_urls, (nchar(basica_urls) + 1) -11, nchar(basica_urls)-4 )
   all_dates <- gsub("[-]", "", all_dates)
+
+  # remove eventual letters
+  all_dates <- sub("a", "", all_dates, fixed = TRUE)
+  ## remove ALL eventual letters
+  # all_dates <- lapply(X = base::letters,
+  #                     FUN = function(x){
+  #                       all_datesf <- sub(x, "", all_dates, fixed = TRUE)
+  #                       return(all_datesf)}
+  #                     )
+  all_dates <- unique(all_dates)
   all_dates <- as.numeric(all_dates)
   return(all_dates)
 }
@@ -112,6 +122,7 @@ get_airport_movement_dates_available <- function(date=NULL) {
   csv_urls <- lapply(X=urls, FUN=recursive_search)
   csv_urls <- unlist(csv_urls)
   # return(csv_urls) # if one wants to return the csv url
+  csv_urls <- gsub('.csv.csv', '.csv', csv_urls, fixed = TRUE)
 
   # get all dates available
   all_dates <- substr(csv_urls , (nchar(csv_urls ) + 1) -10, nchar(csv_urls )-4 )
@@ -134,6 +145,11 @@ get_airport_movement_dates_available <- function(date=NULL) {
 #' a <- get_airfares_dates_available(domestic = TRUE)
 #'}}
 get_airfares_dates_available <- function(dom) {
+
+  message("Function read_airfares() is temporarily  unavailable. See issue #30 https://github.com/ipeaGIT/flightsbr/issues/30")
+  return(NULL)
+
+  stop()
 
   if( ! is.logical(dom) ){ stop(paste0("Argument 'dom' must be either 'TRUE' or 'FALSE.")) }
 
@@ -170,7 +186,7 @@ get_airfares_dates_available <- function(dom) {
   urls <- paste0(base_url, years)
 
   # function to search .csv data in subdirectories
-  recursive_search <- function(i){ # i=urls[2]
+  recursive_search <- function(i){ # i=urls[21]
 
     # read html table
     h2 <- try(rvest::read_html(i), silent = TRUE)
@@ -183,7 +199,7 @@ get_airfares_dates_available <- function(dom) {
     elements2 <- rvest::html_elements(h2, "a")
     href2 <- rvest::html_attr(elements2, "href")
     # files_all <- grep("../", href2, fixed = TRUE, value = TRUE, invert = TRUE)
-    files_csv <- href2[ data.table::like(href2, '.csv|.txt')]
+    files_csv <- href2[ data.table::like(href2, '.csv|.CSV|.txt')]
     # temp_urls <- paste0(i, files_csv)
     # return(temp_urls)
     return(files_csv)
@@ -233,13 +249,15 @@ check_date <- function(date, all_dates) {
 
   error_message <-  paste0("The data is currently only available for dates between ", min(all_dates), " and ", max(all_dates), ".")
 
-  if (nchar(date)==6) {
-    if (!(date %in% all_dates)) {stop(error_message)}
-    }
+  for(d in date){
+    if (nchar(d)==6) {
+      if (!(d %in% all_dates)) {stop(error_message)}
+      }
 
-  if (nchar(date)!=6) {
-    if (!(date %in% unique(substr(all_dates, 1, 4)) )) {stop(error_message)}
+    if (nchar(d)!=6) {
+      if (!(d %in% unique(substr(all_dates, 1, 4)) )) {stop(error_message)}
     }
+  }
 }
 
 
@@ -425,7 +443,7 @@ download_flights_data <- function(file_url, showProgress=showProgress, select=se
   temp_local_file_zip <- paste0('unzip -p ', temp_local_file)
 
   # read zipped file stored locally
-  dt <- data.table::fread( cmd =  temp_local_file_zip, select=select, colClasses = 'character')
+  dt <- data.table::fread( cmd =  temp_local_file_zip, select=select, colClasses = 'character', sep = ';')
 
   # return to original threads
   data.table::setDTthreads(orig_threads)
@@ -470,7 +488,7 @@ download_airfares_data <- function(file_url, showProgress=showProgress, select=s
   data.table::setDTthreads(percent = 100)
 
   # read file stored locally
-  dt <- data.table::fread(input = temp_local_file, select=select, colClasses = 'character') # , dec = ','
+  dt <- data.table::fread(input = temp_local_file, select=select, colClasses = 'character', sep = ';') # , dec = ','
 
   # return to original threads
   data.table::setDTthreads(orig_threads)
@@ -581,7 +599,7 @@ download_airport_movement_data <- function(file_url, showProgress=showProgress){
   #                    ITime =c('HH_PREVISTO', 'HH_CALCO', 'HH_TOQUE'))
 
   # download data and read .csv data file
-  dt <- data.table::fread(temp_local_file, showProgress = showProgress, colClasses = 'character')
+  dt <- data.table::fread(temp_local_file, showProgress = showProgress, colClasses = 'character', sep = ';')
   # class(dt$DT_CALCO)
   # class(dt$HH_PREVISTO)
 

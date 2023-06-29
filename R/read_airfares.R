@@ -31,6 +31,11 @@
 #'}}
 read_airfares <- function(date = 202001, domestic = TRUE, showProgress = TRUE, select = NULL){
 
+  message("Function read_airfares() is temporarily  unavailable. See issue #30 https://github.com/ipeaGIT/flightsbr/issues/30")
+  return(NULL)
+
+  stop()
+
 ### check inputs
   if( ! is.logical(domestic) ){ stop(paste0("Argument 'domestic' must be either 'TRUE' or 'FALSE.")) }
   if( ! is.logical(showProgress) ){ stop(paste0("Argument 'showProgress' must be either 'TRUE' or 'FALSE.")) }
@@ -102,7 +107,7 @@ dt_list <- pbapply::pblapply( X=all_months,
 pbapply::pboptions(original_options)
 
 # row bind data tables
-dt <- data.table::rbindlist(dt_list)
+dt <- data.table::rbindlist(dt_list, fill=TRUE)
 return(dt)
 
 }}
