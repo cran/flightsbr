@@ -1,16 +1,16 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- eval=FALSE, message = FALSE---------------------------------------------
+## ----eval=FALSE, message = FALSE----------------------------------------------
 #  library(flightsbr)
 #  library(data.table)
 #  library(ggplot2)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # in a given **month* of a given **year** (yyyymm)
 #  df_201506 <- read_flights(date=201506, showProgress = FALSE)
 #  
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 #  df_2015 <- read_flights(date=2015, showProgress = FALSE)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  df_201506 <- read_flights(date=201506,
 #                            showProgress = FALSE,
 #                            select = c('id_empresa', 'nr_voo', 'dt_partida_real',
@@ -26,7 +26,7 @@ knitr::opts_chunk$set(
 #  
 #  head(df_201506)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # download flights data
 #  df_2019 <- read_flights(date=2019, showProgress = TRUE)
 #  df_2020 <- read_flights(date=2020, showProgress = TRUE)

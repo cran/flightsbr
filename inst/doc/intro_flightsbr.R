@@ -1,16 +1,16 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- eval = FALSE------------------------------------------------------------
+## ----eval = FALSE-------------------------------------------------------------
 #  install.packages("flightsbr")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  library(flightsbr)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  # in a given **month* of a given **year** (yyyymm)
 #  df_201506 <- read_flights(date=201506, showProgress = FALSE)
 #  
@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 #  df_2015 <- read_flights(date=2015, showProgress = FALSE)
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  airports_all <- flightsbr::read_airports(type = 'all', showProgress = FALSE)
 #  
 #  airports_prv <- flightsbr::read_airports(type = 'private', showProgress = FALSE)
@@ -27,17 +27,17 @@ knitr::opts_chunk$set(
 #  
 #  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  aircrafts <- flightsbr::read_aircrafts(showProgress = FALSE)
 #  
 #  head(aircrafts)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  airport_mov <- flightsbr::read_airport_movements(date=201901)
 #  
 #  head(airport_mov)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  airfares <- flightsbr::read_airfares(date=202003, domestic = TRUE)
 #  
 #  head(airfares)

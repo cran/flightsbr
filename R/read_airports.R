@@ -11,8 +11,8 @@
 #'             columns. Downloading `public` and `private` airports separately
 #'             will return the full set of columns available for each of those
 #'             data sets.
+#' @template showProgress
 #'
-#' @param showProgress Logical. Defaults to `TRUE` display progress.
 #' @return A `"data.table" "data.frame"` object.
 #' @importFrom data.table :=
 #' @export
@@ -34,8 +34,7 @@ read_airports <- function(type = 'all', showProgress = TRUE){
   # data url
   # https://www.gov.br/anac/pt-br/assuntos/regulados/aerodromos/lista-de-aerodromos-civis-cadastrados
   url_public <- 'https://www.gov.br/anac/pt-br/assuntos/regulados/aerodromos/cadastro-de-aerodromos/aerodromos-cadastrados/cadastro-de-aerodromos-civis-publicos.csv'
-  url_private <- 'https://sistemas.anac.gov.br/dadosabertos/Aerodromos/Lista%20de%20aer%C3%B3dromos%20privados/Aerodromos%20Privados/AerodromosPrivados.csv'
-
+  url_private <- 'https://sistemas.anac.gov.br/dadosabertos/Aerodromos/Aer%C3%B3dromos%20Privados/Lista%20de%20aer%C3%B3dromos%20privados/Aerodromos%20Privados/AerodromosPrivados.csv'
 
 ### download public airports
 if (any(type %in% c('public', 'all'))){
@@ -83,7 +82,9 @@ if (any(type %in% c('public', 'all'))){
 
   # add type info
    data.table::setDT(dt_public)[, type := 'public']
-  # dt_public$type <- 'public'
+
+   # convert columns to numeric
+   convert_to_numeric(dt_public)
 
   }
 
@@ -98,7 +99,7 @@ if (any(type %in% c('private', 'all'))){
   dt_private <- try(silent=T,
                     data.table::fread(url_private,
                                       skip = 1,
-                                      # encoding = 'Latin-1',
+                                      encoding = 'Latin-1',
                                       colClasses = 'character',
                                       sep = ';',
                                       showProgress=showProgress))
@@ -132,7 +133,9 @@ if (any(type %in% c('private', 'all'))){
 
   # add type info
    data.table::setDT(dt_private)[, type := 'private']
-  # dt_private$type <- 'private'
+
+   # convert columns to numeric
+   convert_to_numeric(dt_private)
 
   }
 
@@ -152,6 +155,9 @@ if (type == 'all') {
                     dt_private <- dt_private[, cols_to_keep, with=FALSE]
 
                     dt <- data.table::rbindlist(list(dt_public, dt_private), use.names=FALSE)
+
+                    # convert columns to numeric
+                    convert_to_numeric(dt)
 
                     return(dt)
                     }

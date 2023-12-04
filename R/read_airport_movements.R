@@ -8,10 +8,9 @@
 #' \url{https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/operador-aeroportuario/dados-de-movimentacao-aeroportuaria/60-dados-de-movimentacao-aeroportuaria}.
 #'
 #'
-#' @param date Numeric. Date of the data in the format `yyyymm`. Defaults to
-#'             `202001`. To download the data for all months in a year, the user
-#'             can pass a 4-digit year input `yyyy`.
-#' @param showProgress Logical. Defaults to `TRUE` display progress.
+#' @template date
+#' @template showProgress
+#' @template cache
 #'
 #' @return A `"data.table" "data.frame"` object. All columns are returned with
 #'         `class` of type `"character"`.
@@ -23,7 +22,9 @@
 #'
 #' amov2020 <- read_airport_movements(date = 2020)
 #'}}
-read_airport_movements <- function(date = 202001, showProgress = TRUE){
+read_airport_movements <- function(date = 202001,
+                                   showProgress = TRUE ,
+                                   cache = TRUE){
 
   ### check inputs
   if( ! is.logical(showProgress) ){ stop(paste0("Argument 'showProgress' must be either 'TRUE' or 'FALSE.")) }
@@ -50,10 +51,15 @@ read_airport_movements <- function(date = 202001, showProgress = TRUE){
     file_url <- get_airport_movements_url(year=y, month=m)
 
     # download and read data
-    dt <- download_airport_movement_data(file_url, showProgress = showProgress)
+    dt <- download_airport_movement_data(file_url,
+                                         showProgress,
+                                         cache)
 
     # check if download failed
     if (is.null(dt)) { return(invisible(NULL)) } # nocov
+
+    # convert columns to numeric
+    convert_to_numeric(dt)
 
     return(dt)
 
@@ -84,7 +90,9 @@ read_airport_movements <- function(date = 202001, showProgress = TRUE){
                                     file_url <- get_airport_movements_url(year=y, month=m)
 
                                     # download and read data
-                                    temp_dt <- download_airport_movement_data(file_url, showProgress = FALSE)
+                                    temp_dt <- download_airport_movement_data(file_url,
+                                                                              showProgress = FALSE,
+                                                                              cache)
 
                                     # check if download failed
                                     if (is.null(temp_dt)) { return(invisible(NULL)) }
@@ -97,6 +105,10 @@ read_airport_movements <- function(date = 202001, showProgress = TRUE){
 
     # row bind data tables
     dt <- data.table::rbindlist(dt_list)
+
+    # convert columns to numeric
+    convert_to_numeric(dt)
+
     return(dt)
   }
 }

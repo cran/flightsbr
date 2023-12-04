@@ -359,8 +359,9 @@ get_airfares_url <- function(dom, year, month) { # nocov start
 
 #' Download file from url
 #'
-#' @param file_url String. A url passed from get_flights_url.
+#' @param file_url String. A url passed from \code{\link{get_flights_url}}.
 #' @param showProgress Logical, passed from \code{\link{read_flights}}
+#' @param dest_file String, passed from \code{\link{read_flights}}
 #'
 #' @return Silently saves downloaded file to temp dir.
 #'
@@ -370,36 +371,37 @@ get_airfares_url <- function(dom, year, month) { # nocov start
 #' file_url <- get_flights_url(type='basica', year=2000, month=11)
 #'
 #' # download data
-#' download_flightsbr_file(file_url=file_url, showProgress=TRUE)
+#' download_flightsbr_file(file_url=file_url,
+#'                         showProgress=TRUE,
+#'                         dest_file = tempfile(fileext = ".zip")
+#'                        )
 #'}}
-download_flightsbr_file <- function(file_url, showProgress=showProgress){
-
-  # create temp local file
-  file_name <- basename(file_url)
-  temp_local_file <- paste0(tempdir(),"/",file_name)
+download_flightsbr_file <- function(file_url = parent.frame()$file_url,
+                                    showProgress = parent.frame()$showProgress,
+                                    dest_file = temp_local_file){
 
   # download data
   try(
     httr::GET(url=file_url,
               if(showProgress==T){ httr::progress()},
-              httr::write_disk(temp_local_file, overwrite = T),
+              httr::write_disk(dest_file, overwrite = T),
               config = httr::config(ssl_verifypeer = FALSE)
     ), silent = TRUE)
 
   # check if file has NOT been downloaded, try a 2nd time
-  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+  if (!file.exists(dest_file) | file.info(dest_file)$size == 0) {
 
     # download data: try a 2nd time
     try(
       httr::GET(url=file_url,
                 if(showProgress==T){ httr::progress()},
-                httr::write_disk(temp_local_file, overwrite = T),
+                httr::write_disk(dest_file, overwrite = T),
                 config = httr::config(ssl_verifypeer = FALSE)
       ), silent = TRUE)
   }
 
   # Halt function if download failed
-  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+  if (!file.exists(dest_file) | file.info(dest_file)$size == 0) {
     message('Internet connection not working.')
     return(invisible(NULL)) }
 }
@@ -408,10 +410,11 @@ download_flightsbr_file <- function(file_url, showProgress=showProgress){
 
 #' Download and read ANAC flight data
 #'
-#' @param file_url String. A url passed from get_flights_url.
+#' @param file_url String. A url passed from \code{\link{get_flights_url}}.
 #' @param showProgress Logical, passed from \code{\link{read_flights}}
 #' @param select A vector of column names or numbers to keep, passed from \code{\link{read_flights}}
-#'
+#' @param cache Logical, passed from \code{\link{read_flights}}
+
 #' @return A `"data.table" "data.frame"` object
 #'
 #' @keywords internal
@@ -422,28 +425,49 @@ download_flightsbr_file <- function(file_url, showProgress=showProgress){
 #' # download data
 #' a <- download_flights_data(file_url=file_url, showProgress=TRUE, select=NULL)
 #'}}
-download_flights_data <- function(file_url, showProgress=showProgress, select=select){ # nocov start
+download_flights_data <- function(file_url = parent.frame()$file_url,
+                                  showProgress = parent.frame()$showProgress,
+                                  select = parent.frame()$select,
+                                  cache = parent.frame()$cache){ # nocov start
 
   # create temp local file
   file_name <- basename(file_url)
   temp_local_file <- paste0(tempdir(),"/",file_name)
 
-  # check if file has not been downloaded already. If not, download it
-  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+  # use cached files or not
+  if (cache==FALSE & file.exists(temp_local_file)) {
+    unlink(temp_local_file, recursive = T)
+    }
+
+  # has the file been downloaded already? If not, download it
+  if (cache==FALSE | !file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
 
   # download data
-  download_flightsbr_file(file_url=file_url, showProgress=showProgress)
+  download_flightsbr_file(file_url=file_url, showProgress=showProgress, dest_file = temp_local_file)
   }
 
   ### set threads for fread
   orig_threads <- data.table::getDTthreads()
   data.table::setDTthreads(percent = 100)
 
-  # address of zipped file stored locally
-  temp_local_file_zip <- paste0('unzip -p ', temp_local_file)
+  # # address of zipped file stored locally
+  # temp_local_file_zip <- paste0('unzip -p ', temp_local_file)
+  #
+  # # read zipped file stored locally
+  # dt <- data.table::fread( cmd =  temp_local_file_zip, select=select, colClasses = 'character', sep = ';')
 
-  # read zipped file stored locally
-  dt <- data.table::fread( cmd =  temp_local_file_zip, select=select, colClasses = 'character', sep = ';')
+  # unzip file to tempdir
+  temp_local_dir <- tempdir()
+  utils::unzip(zipfile = temp_local_file, exdir = temp_local_dir)
+
+  # get file name
+  file_name <- utils::unzip(temp_local_file, list = TRUE)$Name
+
+  # read file stored locally
+  dt <- data.table::fread( paste0(temp_local_dir,'/', file_name),
+                           select = select,
+                           colClasses = 'character',
+                           sep = ';')
 
   # return to original threads
   data.table::setDTthreads(orig_threads)
@@ -456,7 +480,7 @@ download_flights_data <- function(file_url, showProgress=showProgress, select=se
 
 #' Download and read ANAC air fares data
 #'
-#' @param file_url String. A url passed from get_flights_url.
+#' @param file_url String. A url passed from \code{\link{get_flights_url}}.
 #' @param showProgress Logical, passed from \code{\link{read_flights}}
 #' @param select A vector of column names or numbers to keep, passed from \code{\link{read_flights}}
 #'
@@ -470,7 +494,9 @@ download_flights_data <- function(file_url, showProgress=showProgress, select=se
 #' # download data
 #' a <- download_airfares_data(file_url=file_url, showProgress=TRUE, select=NULL)
 #'}}
-download_airfares_data <- function(file_url, showProgress=showProgress, select=select){ # nocov start
+download_airfares_data <- function(file_url = parent.frame()$file_url,
+                                   showProgress = parent.frame()$showProgress,
+                                   select = parent.frame()$select){ # nocov start
 
   # create temp local file
   file_name <- basename(file_url)
@@ -480,7 +506,7 @@ download_airfares_data <- function(file_url, showProgress=showProgress, select=s
   if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
 
     # download data
-    download_flightsbr_file(file_url=file_url, showProgress=showProgress)
+    download_flightsbr_file(file_url=file_url, showProgress=showProgress, dest_file = temp_local_file)
   }
 
   ### set threads for fread
@@ -564,8 +590,9 @@ get_airport_movements_url <- function(year, month) { # nocov start
 
 #' Download and read ANAC airport movement data
 #'
-#' @param file_url String. A url passed from get_flights_url.
+#' @param file_url String. A url passed from \code{\link{get_flights_url}}.
 #' @param showProgress Logical, passed from \code{\link{read_flights}}
+#' @param cache Logical, passed from \code{\link{read_flights}}
 #'
 #' @return A `"data.table" "data.frame"` object
 #'
@@ -577,17 +604,24 @@ get_airport_movements_url <- function(year, month) { # nocov start
 #' # download data
 #' a <- download_airport_movement_data(file_url=file_url, showProgress=TRUE)
 #'}}
-download_airport_movement_data <- function(file_url, showProgress=showProgress){ # nocov start
+download_airport_movement_data <- function(file_url = parent.frame()$file_url,
+                                           showProgress = parent.frame()$showProgress,
+                                           cache = parent.frame()$cache){ # nocov start
 
   # # create temp local file
   file_name <- basename(file_url)
   temp_local_file <- paste0(tempdir(),"/",file_name)
 
+  # use cached files or not
+  if (cache==FALSE & file.exists(temp_local_file)) {
+    unlink(temp_local_file, recursive = T)
+  }
+
   # check if file has not been downloaded already. If not, download it
-  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+  if (cache==FALSE | !file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
 
     # download data
-    download_flightsbr_file(file_url=file_url, showProgress=showProgress)
+    download_flightsbr_file(file_url=file_url, showProgress=showProgress, dest_file = temp_local_file)
   }
 
   ### set threads for fread
@@ -603,6 +637,150 @@ download_airport_movement_data <- function(file_url, showProgress=showProgress){
   # class(dt$DT_CALCO)
   # class(dt$HH_PREVISTO)
 
+
+  # return to original threads
+  data.table::setDTthreads(orig_threads)
+
+  return(dt)
+}
+
+
+#' @keywords internal
+convert_to_numeric <- function(dt) {
+
+  # detect if there are any columns that should be numeric
+  numeric_cols <- names(dt)[names(dt) %like% 'NR_' | names(dt) %like% 'nr_']
+
+  if (length(numeric_cols)==0) { return(invisible(TRUE)) }
+
+  # convert columns to numeric
+  data.table::setDT(dt)
+  suppressWarnings(
+    dt[,(numeric_cols):= lapply(.SD, as.numeric), .SDcols = numeric_cols]
+    )
+
+  return(invisible(TRUE))
+} # nocov end
+
+
+
+
+
+
+
+
+
+
+#' Retrieve all dates available for aircrafts data from ANAC website
+#'
+#' @return Numeric vector.
+#' @export
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # check dates
+#' a <- get_aircrafts_dates_available()
+#'}}
+get_aircrafts_dates_available <- function() {
+
+  # read html table
+  base_url = 'https://sistemas.anac.gov.br/dadosabertos/Aeronaves/RAB/Historico_RAB/'
+  h <- try(rvest::read_html(base_url), silent = TRUE)
+
+  # check if internet connection worked
+  if (class(h)[1]=='try-error') {                                           #nocov
+    message("Problem connecting to ANAC data server. Please try it again.") #nocov
+    return(invisible(NULL))                                                 #nocov
+  }
+
+  # filter elements of basica data
+  elements <- rvest::html_elements(h, "a")
+  basica_urls <- elements[ data.table::like(elements, '.csv') ]
+  basica_urls <- lapply(X=basica_urls, FUN=function(i){rvest::html_attr(i,"href")})
+
+  # get all dates available
+  all_dates <- substr(basica_urls, 1, nchar(basica_urls)-4 )
+  all_dates <- gsub("[-]", "", all_dates)
+  all_dates <- gsub("[_]", "", all_dates)
+
+  # remove eventual letters
+  all_dates <- sub("a", "", all_dates, fixed = TRUE)
+  ## remove ALL eventual letters
+  # all_dates <- lapply(X = base::letters,
+  #                     FUN = function(x){
+  #                       all_datesf <- sub(x, "", all_dates, fixed = TRUE)
+  #                       return(all_datesf)}
+  #                     )
+  all_dates <- unique(all_dates)
+  all_dates <- as.numeric(all_dates)
+  return(all_dates)
+}
+
+
+
+#' Put together the url of aircrafts data files
+#'
+#' @param year Numeric. Year of the data in `yyyy` format.
+#' @param month Numeric. Month of the data in `mm` format.
+#'
+#' @return A url string.
+#'
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # Generate url
+#' a <- get_flights_url(year=2000, month=11)
+#'}}
+get_aircrafts_url <- function(year, month) { # nocov start
+
+  if( nchar(month) ==1 ) { month <- paste0('0', month)}
+
+  url_root <- 'https://sistemas.anac.gov.br/dadosabertos/Aeronaves/RAB/Historico_RAB/'
+
+  file_name <- paste0(year, '-', month, '.csv')
+  file_url <- paste0(url_root, file_name)
+  return(file_url)
+} # nocov end
+
+
+
+#' Download and read ANAC aircraft data
+#'
+#' @param file_url String. A url passed from \code{\link{get_flights_url}}.
+#' @param showProgress Logical, passed from \code{\link{read_flights}}
+#'
+#' @return A `"data.table" "data.frame"` object
+#'
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#' # Generate url
+#' file_url <- get_airfares_url(dom = TRUE, year=2002, month=11)
+#'
+#' # download data
+#' a <- download_airfares_data(file_url=file_url, showProgress=TRUE, select=NULL)
+#'}}
+download_aircrafts_data <- function(file_url = parent.frame()$file_url,
+                                   showProgress = parent.frame()$showProgress
+                                   ){ # nocov start
+
+  # create temp local file
+  file_name <- basename(file_url)
+  temp_local_file <- paste0(tempdir(),"/",file_name)
+
+  # check if file has not been downloaded already. If not, download it
+  if (!file.exists(temp_local_file) | file.info(temp_local_file)$size == 0) {
+
+    # download data
+    download_flightsbr_file(file_url=file_url, showProgress=showProgress, dest_file = temp_local_file)
+  }
+
+  ### set threads for fread
+  orig_threads <- data.table::getDTthreads()
+  data.table::setDTthreads(percent = 100)
+
+  # read file stored locally
+  dt <- data.table::fread(input = temp_local_file,
+                          encoding = 'UTF-8',
+                          colClasses = 'character',
+                          sep = ';') # , dec = ','
 
   # return to original threads
   data.table::setDTthreads(orig_threads)

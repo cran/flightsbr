@@ -1,23 +1,23 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
+## ----eval=FALSE, message=FALSE------------------------------------------------
 #  library(flightsbr)
 #  library(ggplot2)
 #  # library(geobr)
 #  
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
+## ----eval=FALSE, message=FALSE------------------------------------------------
 #  # private airports
 #  airports_prv <- flightsbr::read_airports(type = 'private', showProgress = FALSE)
 #  
 #  # public airports
 #  airports_pbl <- flightsbr::read_airports(type = 'public', showProgress = FALSE)
 
-## ---- eval=FALSE, message=FALSE-----------------------------------------------
+## ----eval=FALSE, message=FALSE------------------------------------------------
 #  airports_all <- flightsbr::read_airports(type = 'all', showProgress = FALSE)
 #  
 #  # plot
