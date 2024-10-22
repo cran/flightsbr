@@ -7,16 +7,16 @@
 #' # check dates
 #' a <- get_flight_dates_available()
 #'}}
-get_flight_dates_available <- function() {
+get_flight_dates_available <- function() { # nocov start
 
   # read html table
   url = 'https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/Instrucoes-para-a-elaboracao-e-apresentacao-das-demonstracoes-contabeis/envio-de-informacoes'
   h <- try(rvest::read_html(url), silent = TRUE)
 
   # check if internet connection worked
-  if (class(h)[1]=='try-error') {                                           #nocov
-    message("Problem connecting to ANAC data server. Please try it again.") #nocov
-    return(invisible(NULL))                                                 #nocov
+  if (class(h)[1]=='try-error') {
+    message("Problem connecting to ANAC data server. Please try it again.")
+    return(invisible(NULL))
   }
 
   # filter elements of basica data
@@ -39,7 +39,7 @@ get_flight_dates_available <- function() {
   all_dates <- unique(all_dates)
   all_dates <- as.numeric(all_dates)
   return(all_dates)
-}
+}  # nocov end
 
 
 
@@ -138,9 +138,9 @@ download_flights_data <- function(file_url = parent.frame()$file_url,
       cache = cache)
 
   # check if internet connection worked
-  if (is.null(check_download)) { # nocov start
-    message("Problem connecting to ANAC data server. Please try it again.") #nocov
-    return(invisible(NULL))                                              #nocov
+  if (is.null(check_download)) {
+    message("Problem connecting to ANAC data server. Please try it again.")
+    return(invisible(NULL))
     }
   }
 
@@ -154,12 +154,16 @@ download_flights_data <- function(file_url = parent.frame()$file_url,
                               showProgress = parent.frame()$showProgress,
                               select = parent.frame()$select){
 
-    # single_temp_local_file = temp_local_file[12]
+    # single_temp_local_file = temp_local_file[1]
 
     # unzip file to tempdir
     temp_local_dir <- fs::path_temp()
+
     #  utils::unzip(zipfile = single_temp_local_file, exdir = temp_local_dir)
-    archive::archive_extract(archive = single_temp_local_file, dir = temp_local_dir)
+    archive::archive_extract(
+      archive = single_temp_local_file,
+      dir = temp_local_dir
+      )
 
 
     # get file name

@@ -49,7 +49,7 @@ overflow: visible;
 </style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -356,14 +356,14 @@ currently includes five main functions:</p>
 flight to and from Brazil, as well as domestic flights within the
 country. The data include flight-level information of airports of origin
 and destination, flight duration, aircraft type, payload, and the number
-of passengers, and several other variables. - <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/Instrucoes-para-a-elaboracao-e-apresentacao-das-demonstracoes-contabeis/descricao-de-variaveis">Data
+of passengers, as well as several other variables. - <a href="https://www.gov.br/anac/pt-br/assuntos/regulados/empresas-aereas/Instrucoes-para-a-elaboracao-e-apresentacao-das-demonstracoes-contabeis/descricao-de-variaveis">Data
 dictionary for flights</a>.</p>
 </div>
 <div id="read_airports" class="section level3">
-<h3>2) <code>read_airports()</code></h3>
+<h3>2) <code>read_airports()</code>:</h3>
 <p>Airports data covers all airports and aerodromes registered in
-Brazil’s Civil Aviation Agency (ANAC). It covers detailed information on
-ICAO code, municipality, geographical coordinates, runway dimensions
+Brazil’s Civil Aviation Agency (ANAC). It includes detailed information
+on ICAO code, municipality, geographical coordinates, runway dimensions
 etc.</p>
 <ul>
 <li>Data dictionary:
@@ -412,10 +412,10 @@ version from CRAN.</p>
 <div id="download-flights-data" class="section level4">
 <h4>Download flights data:</h4>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># in a given **month* of a given **year** (yyyymm)</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>df_201506 <span class="ot">&lt;-</span> <span class="fu">read_flights</span>(<span class="at">date=</span><span class="dv">201506</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>df_201506 <span class="ot">&lt;-</span> <span class="fu">read_flights</span>(<span class="at">date =</span> <span class="dv">201506</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># in a given year (yyyy)</span></span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>df_2015 <span class="ot">&lt;-</span> <span class="fu">read_flights</span>(<span class="at">date=</span><span class="dv">2015</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>df_2015 <span class="ot">&lt;-</span> <span class="fu">read_flights</span>(<span class="at">date =</span> <span class="dv">2015</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="download-airports-data" class="section level4">
 <h4>Download airports data:</h4>
@@ -427,20 +427,20 @@ version from CRAN.</p>
 </div>
 <div id="download-data-of-aircrafts" class="section level4">
 <h4>Download data of aircrafts:</h4>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>aircrafts <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_aircrafts</span>(<span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>aircrafts <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_aircrafts</span>(<span class="at">date =</span> <span class="dv">2024</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">head</span>(aircrafts)</span></code></pre></div>
 </div>
 <div id="download-data-on-airport-movements" class="section level4">
 <h4>Download data on airport movements:</h4>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>airport_mov <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airport_movements</span>(<span class="at">date=</span><span class="dv">201901</span>)</span>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>airport_mov <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airport_movements</span>(<span class="at">date =</span> <span class="dv">201901</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">head</span>(airport_mov)</span></code></pre></div>
 </div>
 <div id="download-data-on-data-on-air-fares-of-domestic-flights-in-brazil" class="section level4">
 <h4>Download data on data on air fares of domestic flights in
 Brazil:</h4>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>airfares <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airfares</span>(<span class="at">date=</span><span class="dv">202003</span>, <span class="at">domestic =</span> <span class="cn">TRUE</span>)</span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>airfares <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airfares</span>(<span class="at">date =</span> <span class="dv">202003</span>, <span class="at">domestic =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">head</span>(airfares)</span></code></pre></div>
 </div>

@@ -40,6 +40,7 @@ read_flights <- function(date = 202001,
   if( ! type %in% c('basica', 'combinada') ){ stop(paste0("Argument 'type' must be either 'basica' or 'combinada'")) }
   if( ! is.logical(showProgress) ){ stop(paste0("Argument 'showProgress' must be either 'TRUE' or 'FALSE.")) }
   if( ! is.logical(cache) ){ stop(paste0("Argument 'cache' must be either 'TRUE' or 'FALSE.")) }
+  check_input_date_format(date)
 
 ### check date input
   # get all dates available
@@ -69,7 +70,15 @@ read_flights <- function(date = 202001,
 #### prep data
 
   # row bind data tables
-  dt <- data.table::rbindlist(dt_list)
+  dt <- data.table::rbindlist(dt_list, fill = TRUE)
+
+  # clean names
+  nnn <- names(dt)
+  data.table::setnames(
+    x = dt,
+    old = nnn,
+    new = janitor::make_clean_names(nnn)
+  )
 
   # convert columns to numeric
   convert_to_numeric(dt)

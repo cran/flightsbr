@@ -14,7 +14,7 @@ test_that("read_airport_movements", {
   testthat::expect_true(nrow(test1) >0 )
 
   # check conteudo
-  testthat::expect_equal( as.character(min(test1$DT_PREVISTO)), as.character("2021-12-31") )
+  testthat::expect_equal( as.character(min(test1$dt_previsto)), as.character("2021-12-31") )
 
   # all months in a year
   test2 <- read_airport_movements(date=2022, showProgress = FALSE)
@@ -45,6 +45,9 @@ test_that("read_airport_movements", {
   # Wrong date 4 digits
   testthat::expect_error(read_airport_movements(date=1990))
   testthat::expect_error(read_airport_movements(date=199012))
+
+  # mixed date format
+  testthat::expect_error(read_airport_movements(date=c(2020, 202101)))
 
   # Wrong type and showProgress and cache
   testthat::expect_error(read_airport_movements(showProgress='banana'))

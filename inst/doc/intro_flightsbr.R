@@ -12,10 +12,10 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE---------------------------------------------------------------
 #  # in a given **month* of a given **year** (yyyymm)
-#  df_201506 <- read_flights(date=201506, showProgress = FALSE)
+#  df_201506 <- read_flights(date = 201506, showProgress = FALSE)
 #  
 #  # in a given year (yyyy)
-#  df_2015 <- read_flights(date=2015, showProgress = FALSE)
+#  df_2015 <- read_flights(date = 2015, showProgress = FALSE)
 #  
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -28,17 +28,17 @@ knitr::opts_chunk$set(
 #  
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  aircrafts <- flightsbr::read_aircrafts(showProgress = FALSE)
+#  aircrafts <- flightsbr::read_aircrafts(date = 2024, showProgress = FALSE)
 #  
 #  head(aircrafts)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  airport_mov <- flightsbr::read_airport_movements(date=201901)
+#  airport_mov <- flightsbr::read_airport_movements(date = 201901)
 #  
 #  head(airport_mov)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  airfares <- flightsbr::read_airfares(date=202003, domestic = TRUE)
+#  airfares <- flightsbr::read_airfares(date = 202003, domestic = TRUE)
 #  
 #  head(airfares)
 

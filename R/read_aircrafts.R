@@ -30,6 +30,7 @@ read_aircrafts <- function(date = 202001,
 ### check inputs
   if( ! is.logical(showProgress) ){ stop(paste0("Argument 'showProgress' must be either 'TRUE' or 'FALSE.")) }
   if( ! is.logical(cache) ){ stop(paste0("Argument 'cache' must be either 'TRUE' or 'FALSE.")) }
+  check_input_date_format(date)
 
   ### check date input
   # get all dates available
@@ -52,9 +53,16 @@ read_aircrafts <- function(date = 202001,
   # check if download failed
   if (is.null(dt)) { return(invisible(NULL)) }
 
+  # clean names
+  nnn <- names(dt)
+  data.table::setnames(
+    x = dt,
+    old = nnn,
+    new = janitor::make_clean_names(nnn)
+    )
+
   # convert columns to numeric
   convert_to_numeric(dt)
 
   return(dt)
-
 }

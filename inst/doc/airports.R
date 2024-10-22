@@ -12,13 +12,22 @@ knitr::opts_chunk$set(
 
 ## ----eval=FALSE, message=FALSE------------------------------------------------
 #  # private airports
-#  airports_prv <- flightsbr::read_airports(type = 'private', showProgress = FALSE)
+#  airports_prv <- flightsbr::read_airports(
+#    type = 'private',
+#    showProgress = FALSE
+#    )
 #  
 #  # public airports
-#  airports_pbl <- flightsbr::read_airports(type = 'public', showProgress = FALSE)
+#  airports_pbl <- flightsbr::read_airports(
+#    type = 'public',
+#    showProgress = FALSE
+#    )
 
 ## ----eval=FALSE, message=FALSE------------------------------------------------
-#  airports_all <- flightsbr::read_airports(type = 'all', showProgress = FALSE)
+#  airports_all <- flightsbr::read_airports(
+#    type = 'all',
+#    showProgress = FALSE
+#    )
 #  
 #  # plot
 #  # brazil <- geobr::read_country()

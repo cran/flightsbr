@@ -14,7 +14,7 @@
 #' # check dates
 #' a <- check_date(200011, all_dates)
 #'}}
-check_date <- function(date, all_dates) {
+check_date <- function(date, all_dates) { # nocov start
 
   error_message <-  paste0("The data is currently only available for dates between ", min(all_dates), " and ", max(all_dates), ".")
 
@@ -27,7 +27,7 @@ check_date <- function(date, all_dates) {
       if (!(d %in% unique(substr(all_dates, 1, 4)) )) {stop(error_message)}
     }
   }
-}
+}  # nocov end
 
 
 
@@ -86,7 +86,7 @@ generate_all_months <- function(date) { # nocov start
 download_flightsbr_file <- function(file_url = parent.frame()$file_url,
                                     showProgress = parent.frame()$showProgress,
                                     dest_file = temp_local_file,
-                                    cache = cache){
+                                    cache = cache){ # nocov start
 
   # address to temp file
   dest_file <- fs::path(fs::path_temp(), basename(file_url))
@@ -128,7 +128,7 @@ download_flightsbr_file <- function(file_url = parent.frame()$file_url,
       }
   }
 
-}
+}  # nocov end
 
 
 
@@ -169,20 +169,57 @@ latlon_to_numeric <- function(df){ # nocov start
 } # nocov end
 
 
+#' Convert altitude column to numeric
+#'
+#' @param df A data.frame internal to the `read_airport()` function.
+#'
+#' @return A `"data.table" "data.frame"` object
+#'
+#' @keywords internal
+altitude_to_numeric <- function(df){ # nocov start
+
+  # check if df has lat lon colnames
+  if(!'altitude' %in% names(df)){ stop("Column 'altitude' is missing from original ANAC data.") }
+
+  # supress warning
+  defaultW <- getOption("warn")
+  options(warn = -1)
+
+  # fix string
+  df[, altitude := gsub(" m", "", altitude) ]
+  df[, altitude := gsub(",", ".", altitude) ]
+
+  # convert to numeric
+  df[, altitude := as.numeric(altitude) ]
+
+  # restore warnings
+  options(warn = defaultW)
+
+  return(df)
+} # nocov end
 
 
 
 
 #' @keywords internal
-convert_to_numeric <- function(dt) {
+convert_to_numeric <- function(dt, type='standard') { # nocov start
 
   # detect if there are any columns that should be numeric
-  numeric_cols <- names(dt)[names(dt) %like% 'NR_' | names(dt) %like% 'nr_']
+  numeric_cols <- names(dt)[names(dt) %like% 'NR_|nr_|qt_|comprimento_|largura_']
+  numeric_cols <- numeric_cols[numeric_cols != 'nr_singular']
+
+  if (type =='airfare') {
+    airfare_num_cols <- c('ano', 'mes', 'tarifa_n', 'tarifa', 'assentos')
+    airfare_num_cols <- airfare_num_cols[airfare_num_cols %in% names(dt)]
+    numeric_cols <- c(numeric_cols, airfare_num_cols)
+    }
+
 
   if (length(numeric_cols)==0) { return(invisible(TRUE)) }
 
-  # convert columns to numeric
-  data.table::setDT(dt)
+  # replace , with . for numbers
+  dt[,(numeric_cols):= lapply(.SD, FUN = function(x){gsub(',','.',x)}), .SDcols = numeric_cols]
+  # to numeric
   suppressWarnings(
     dt[,(numeric_cols):= lapply(.SD, as.numeric), .SDcols = numeric_cols]
     )
@@ -198,5 +235,32 @@ convert_to_numeric <- function(dt) {
 
 
 
+#' Check whether the format of the date input is acceptable
+#' @param date Vector. Either a 6-digit date in the format `yyyymm` or a 4-digit
+#'             date input `yyyy` .
+#'
+#' @return Check messages.
+#' @export
+#' @keywords internal
+#' @examples \dontrun{ if (interactive()) {
+#'
+#' # get all dates available
+#' all_dates <- get_all_dates_available()
+#'
+#' # check dates
+#' a <- check_date(200011, all_dates)
+#'}}
+check_input_date_format <- function(date = parent.frame()$date) { # nocov start
+
+  # are all dates yyyy
+  yyyy <- (all(nchar(date)==4))
+
+  # are all dates yyyymm
+  yyyymm <- (all(nchar(date)==6))
+
+  if(yyyy + yyyymm == 0){
+  stop("The 'date' input must be consistent in either a 6-digit format `yyyymm` OR a 4-digit format `yyyy`.")
+  }
+} # nocov end
 
 
