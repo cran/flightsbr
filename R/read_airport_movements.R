@@ -22,7 +22,7 @@
 #'
 #' amov2020 <- read_airport_movements(date = 2020)
 #'}}
-read_airport_movements <- function(date = 202001,
+read_airport_movements <- function(date = NULL,
                                    showProgress = TRUE,
                                    cache = TRUE
                                    ){
@@ -37,9 +37,10 @@ read_airport_movements <- function(date = 202001,
   all_dates <- get_airport_movement_dates_available()
 
   # check if download failed
-  if (is.null(all_dates)) { return(invisible(NULL)) } # nocov
+  if (is.null(all_dates)) { return(invisible(NULL)) }
 
   # check dates
+  if (is.null(date)) { date <- max(all_dates) }
   check_date(date=date, all_dates)
 
 

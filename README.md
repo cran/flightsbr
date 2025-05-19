@@ -2,11 +2,11 @@
 
 [![CRAN
    status](https://www.r-pkg.org/badges/version/flightsbr)](https://CRAN.R-project.org/package=flightsbr)
-[![R-CMD-check](https://github.com/ipeaGIT/flightsbr/workflows/R-CMD-check/badge.svg)](https://github.com/ipeaGIT/flightsbr/actions)
-[![Lifecycle:
-     experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![CRAN/METACRAN Total
    downloads](https://cranlogs.r-pkg.org/badges/grand-total/flightsbr?color=yellow)](https://CRAN.R-project.org/package=flightsbr)
+[![R-CMD-check](https://github.com/ipeaGIT/flightsbr/workflows/R-CMD-check/badge.svg)](https://github.com/ipeaGIT/flightsbr/actions)
+[![Lifecycle:
+     active](https://img.shields.io/badge/lifecycle-active-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 [![Codecov test
 coverage](https://codecov.io/gh/ipeaGIT/flightsbr/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ipeaGIT/flightsbr?branch=main)
 [![DOI](https://img.shields.io/badge/DOI-10.31219%2Fosf.io%2Fjdv7u-blue)](https://doi.org/10.31219/osf.io/jdv7u)
@@ -30,7 +30,7 @@ The package currently includes [five main functions](https://ipeagit.github.io/f
 
 1. `read_flights()`
 2. `read_airports()`
-3. `read_aircrafts()`
+3. `read_aircraft()`
 4. `read_airport_movements()`
 5. `read_airfares()`
 
@@ -58,9 +58,9 @@ airports_prv <- flightsbr::read_airports(type = 'private')
 
 ```
 
-#### 3) `read_aircrafts()` to download aircrafts data.
+#### 3) `read_aircraft()` to download aircraft data.
 ```
-aircrafts <- read_aircrafts(date = 2024)
+aircraft <- read_aircraft(date = 2024)
 ```
 
 #### 4) `read_airport_movements()` to download data on aiport movements.
@@ -76,7 +76,11 @@ airfares <- read_airfares(date = 202001, domestic = TRUE)
 
 #### **Related projects**
 
-- [openSkies: a client interface to the 'OpenSky' API](https://github.com/Rafael-Ayala/openSkies)
+Similar packages for other countries/continents
+- World: [openSkies: a client interface to the 'OpenSky' API](https://github.com/Rafael-Ayala/openSkies)
+- USA: [anyflights](https://simonpcouch.github.io/anyflights/)
+
+Similar projects for Brazil:
 
 As of today, there are two repositories/projects with Brazilian aviation data, which include more info related to weather conditions, air traffic management etc. The advantage of **flightsbt** is that it's the easiest and fastest way to download flight and airport Data from Brazil in `R`.
 

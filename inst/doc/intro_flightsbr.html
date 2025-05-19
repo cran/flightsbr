@@ -346,7 +346,7 @@ currently includes five main functions:</p>
 <ol style="list-style-type: decimal">
 <li><code>read_flights()</code></li>
 <li><code>read_airports()</code></li>
-<li><code>read_aircrafts()</code></li>
+<li><code>read_aircraft()</code></li>
 <li><code>read_airport_movements()</code></li>
 <li><code>read_airfares()</code></li>
 </ol>
@@ -375,12 +375,12 @@ airports</a>.</li>
 </ul></li>
 </ul>
 </div>
-<div id="read_aircrafts" class="section level3">
-<h3>3) <code>read_aircrafts()</code>:</h3>
-<p>All aircrafts registered in the Brazilian Aeronautical Registry
+<div id="read_aircraft" class="section level3">
+<h3>3) <code>read_aircraft()</code>:</h3>
+<p>All aircraft registered in the Brazilian Aeronautical Registry
 (Registro Aeronáutico Brasileiro - RAB), organized by the Brazilian
 Civil Aviation Agency (ANAC). - <a href="https://www.anac.gov.br/acesso-a-informacao/dados-abertos/areas-de-atuacao/aeronaves/registro-aeronautico-brasileiro/5-registro-aeronautico-brasileiro">Data
-dictionary for aircrafts data</a>.</p>
+dictionary for aircraft data</a>.</p>
 </div>
 <div id="read_airport_movements" class="section level3">
 <h3>4) <code>read_airport_movements()</code>:</h3>
@@ -425,11 +425,11 @@ version from CRAN.</p>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>airports_pbl <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_airports</span>(<span class="at">type =</span> <span class="st">&#39;public&#39;</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 </div>
-<div id="download-data-of-aircrafts" class="section level4">
-<h4>Download data of aircrafts:</h4>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>aircrafts <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_aircrafts</span>(<span class="at">date =</span> <span class="dv">2024</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
+<div id="download-data-of-aircraft" class="section level4">
+<h4>Download data of aircraft:</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>aircraft <span class="ot">&lt;-</span> flightsbr<span class="sc">::</span><span class="fu">read_aircraft</span>(<span class="at">date =</span> <span class="dv">2024</span>, <span class="at">showProgress =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">head</span>(aircrafts)</span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">head</span>(aircraft)</span></code></pre></div>
 </div>
 <div id="download-data-on-airport-movements" class="section level4">
 <h4>Download data on airport movements:</h4>
