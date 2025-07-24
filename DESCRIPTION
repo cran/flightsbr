@@ -1,7 +1,7 @@
 Type: Package
 Package: flightsbr
 Title: Download Flight and Airport Data from Brazil
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: 
     c(person(given="Rafael H. M.", family="Pereira", 
              email="rafa.pereira.br@gmail.com", 
@@ -26,10 +26,10 @@ VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-05-19 20:35:10 UTC; r1701707
+Packaged: 2025-07-24 18:08:09 UTC; rafap
 Author: Rafael H. M. Pereira [aut, cre] (ORCID:
     <https://orcid.org/0000-0003-2125-7465>),
   Ipea - Institute for Applied Economic Research [cph, fnd]
 Maintainer: Rafael H. M. Pereira <rafa.pereira.br@gmail.com>
 Repository: CRAN
-Date/Publication: 2025-05-19 20:50:05 UTC
+Date/Publication: 2025-07-24 23:50:16 UTC
