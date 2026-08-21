@@ -7,7 +7,7 @@ testthat::skip_on_cran()
 
 # Reading the data -----------------------
 
-test_that("read_airfares", {
+testthat::test_that("read_airfares", {
 
   # (default), one month, basica, progress
   test1 <- read_airfares()
@@ -32,16 +32,18 @@ test_that("read_airfares", {
   testthat::expect_equal( as.character(min(test3$ano)), as.character("2004") )
   testthat::expect_equal( as.character(min(test4$nr_ano_referencia)), as.character("2025") )
 
-  # all months in a year
-  test5 <- read_airfares(date=200401:200402, select='tarifa-n', showProgress = TRUE)
+  # multiple months in a year
+  test5 <- read_airfares(date=200401:200402, select='TARIFA', showProgress = TRUE)
   testthat::expect_true(is(test5, "data.table") | is.null(test5))
+  testthat::expect_equal(names(test5), 'tarifa')
 
   test6 <- read_airfares(date=201101:201102,
                          domestic = FALSE,
                          showProgress = FALSE,
-                         select='valor_tarifa'
+                         select='VALOR_TARIFA'
                          )
   testthat::expect_true(is(test6, "data.table"))
+  testthat::expect_equal(names(test6), 'valor_tarifa')
 
   # test vector of dates
   test7 <- read_airfares(date = c(200401, 200402), showProgress = FALSE)
@@ -52,7 +54,7 @@ test_that("read_airfares", {
 
 
 # ERRORS and messages  -----------------------
-test_that("read_airfares", {
+testthat::test_that("read_airfares", {
 
   # Wrong date 4 digits
   testthat::expect_error(read_airfares(date=1990))
@@ -75,3 +77,14 @@ test_that("read_airfares", {
   testthat::expect_warning(read_airfares(select='banana'))
   testthat::expect_error(read_airfares(cache='banana'))
 })
+
+# # mock test
+# testthat::test_that("internet problem: throws informative message", {
+#
+#   testthat::local_mocked_bindings(
+#     download_flightsbr_file = function(...) NULL
+#   )
+#
+#   testthat::expect_message( read_airfares() )
+#   testthat::expect_null( read_airfares() )
+# })

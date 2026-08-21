@@ -15,22 +15,29 @@ flights within the country.
 \section{Usage}{
 
 Please check the vignettes and data documentation on the
-\href{https://ipeagit.github.io/flightsbr/}{website}.
+\href{https://ipea.github.io/flightsbr/}{website}.
 }
 
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/ipeaGIT/flightsbr}
-  \item Report bugs at \url{https://github.com/ipeaGIT/flightsbr/issues}
+  \item \url{https://github.com/ipea/flightsbr}
+  \item \url{https://ipea.github.io/flightsbr/}
+  \item Report bugs at \url{https://github.com/ipea/flightsbr/issues}
 }
 
 }
 \author{
 \strong{Maintainer}: Rafael H. M. Pereira \email{rafa.pereira.br@gmail.com} (\href{https://orcid.org/0000-0003-2125-7465}{ORCID})
 
+Authors:
+\itemize{
+  \item Rafael H. M. Pereira \email{rafa.pereira.br@gmail.com} (\href{https://orcid.org/0000-0003-2125-7465}{ORCID})
+}
+
 Other contributors:
 \itemize{
+  \item Arthur Bazolli \email{baz.arthur@gmail.com} [contributor]
   \item Ipea - Institute for Applied Economic Research [copyright holder, funder]
 }
 

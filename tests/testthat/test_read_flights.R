@@ -6,9 +6,10 @@ testthat::skip_on_cran()
 
 
 # Reading the data -----------------------
-cols <- c('nr_ano_referencia' , 'nr_mes_referencia')
 
 test_that("read_flights", {
+
+  cols <- c('nr_ano_referencia' , 'nr_mes_referencia')
 
   # (default), one month, basica, progress
   test1 <- read_flights()
@@ -72,3 +73,15 @@ test_that("read_flights", {
   testthat::expect_error(read_flights(cache='banana'))
   testthat::expect_warning(read_flights(select='banana'))
 })
+
+
+# # mock test
+# test_that("internet problem: throws informative message", {
+#
+#   testthat::local_mocked_bindings(
+#     download_flightsbr_file = function(...) NULL
+#   )
+#
+#   testthat::expect_message( read_flights() )
+#   # testthat::expect_null( read_flights() )
+# })

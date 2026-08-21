@@ -75,5 +75,5 @@ knitr::opts_chunk$set(
 # 
 
 ## ----daily passengers, eval=TRUE, echo=FALSE, message=FALSE, out.width='100%'----
-knitr::include_graphics("https://github.com/ipeaGIT/flightsbr/blob/main/inst/img/vig_output_flights.png?raw=true")
+knitr::include_graphics("https://github.com/ipea/flightsbr/blob/main/inst/img/vig_output_flights.png?raw=true")
 

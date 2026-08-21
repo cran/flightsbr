@@ -1,14 +1,14 @@
 #' flightsbr: Download Flight and Airport Data from Brazil
 #'
 #' Download flight and airport data from Brazil’s Civil Aviation Agency (ANAC)
-#'  <https://www.gov.br/anac/pt-br>. The data includes detailed information on all
-#'  aircrafts, aerodromes, airports, and airport movements registered in ANAC,
-#'   and on every international flight to and from Brazil, as well as domestic
-#'   flights within the country.
+#' <https://www.gov.br/anac/pt-br>. The data includes detailed information on all
+#' aircrafts, aerodromes, airports, and airport movements registered in ANAC,
+#' and on every international flight to and from Brazil, as well as domestic
+#' flights within the country.
 #'
 #' @section Usage:
 #' Please check the vignettes and data documentation on the
-#' [website](https://ipeagit.github.io/flightsbr/).
+#' [website](https://ipea.github.io/flightsbr/).
 #'
 #' @docType package
 #' @name flightsbr
@@ -28,5 +28,6 @@ utils::globalVariables( c('month', # nocov start
                           'NR_',
                           'nr_',
                           'reference_date',
-                          'altitude') )  # nocov end
+                          'altitude',
+                          'success') )  # nocov end
 

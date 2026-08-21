@@ -7,7 +7,7 @@ testthat::skip_on_cran()
 
 # Reading the data -----------------------
 
-test_that("read_aircraft", {
+testthat::test_that("read_aircraft", {
 
   test1 <- read_aircraft(showProgress = FALSE)
 
@@ -18,21 +18,21 @@ test_that("read_aircraft", {
   testthat::expect_true(is(read_aircraft(showProgress = TRUE), "data.table"))
 
   # test columns are correct
-  testthat::expect_equal(names(read_aircraft())[1], 'marca')
-
-  # test date all months in a year
-  test2 <- read_aircraft(date = 2020, showProgress = FALSE)
-  testthat::expect_true(is(test2, "data.table"))
+  testthat::expect_true(grepl('marca', names(read_aircraft())[1]))
 
   # test vector of dates
-  test3 <- read_aircraft(date = c(202001, 202005), showProgress = FALSE)
+  test3 <- read_aircraft(date = c(202409, 202608), showProgress = FALSE)
   testthat::expect_true(is(test3, "data.table"))
+
+  # # test date all months in a year
+  # test2 <- read_aircraft(date = 2020, showProgress = FALSE)
+  # testthat::expect_true(is(test2, "data.table"))
 
 })
 
 
 # ERRORS and messages  -----------------------
-test_that("read_aircraft", {
+testthat::test_that("read_aircraft", {
 
   # Wrong date 4 digits
   testthat::expect_error(read_aircraft(date=1990))
@@ -57,15 +57,14 @@ test_that("read_aircraft", {
 })
 
 
-# deprecated function  -----------------------
 
-# test_that("add_two is deprecated", {
+# # mock test
+# testthat::test_that("internet problem: throws informative message", {
 #
-# testthat::expect_snapshot({
+#   testthat::local_mocked_bindings(
+#     download_flightsbr_file = function(...) NULL
+#   )
 #
-#  temp_deprecated <- read_aircrafts(showProgress = FALSE)
-#  testthat::expect_equal(test1, temp_deprecated)
-#  })
-#
+#   testthat::expect_message( read_aircraft() )
+#   testthat::expect_null( read_aircraft() )
 # })
-

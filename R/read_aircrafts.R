@@ -27,12 +27,9 @@ read_aircrafts <- function(date = 202001,
                            ){
 
 
-  lifecycle::deprecate_warn("1.0.1", "read_aircrafts()", "read_aircraft()")
-
-
-  temp <- read_aircraft(date = date,
-                showProgress = FALSE,
-                cache = cache)
-
-  return(temp)
+  lifecycle::deprecate_stop(
+    when = "v1.0.1",
+    what = "read_aircrafts()",
+    with = "read_aircraft()"
+    )
 }
