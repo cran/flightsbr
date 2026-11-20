@@ -20,8 +20,11 @@
 #' @template cache
 #' @template select
 #'
-#' @return A `"data.table" "data.frame"` object. All columns are returned with
-#'         `class` of type `"character"`.
+#' @return A `"data.table" "data.frame"` object. Columns of counts and
+#'         measures are numeric; codes and identifiers (e.g. flight numbers,
+#'         serial numbers, airport codes) are character, keeping leading
+#'         zeros. A column with some values that are not numbers stays
+#'         character, with a message.
 #' @export
 #' @family download flight data
 #' @examples \dontrun{ if (interactive()) {
@@ -39,14 +42,9 @@ read_flights <- function(
   ){
 
   ### check inputs
-  requested_type <- match.arg(type, c("basica", "combinada"))
-
-  if (!is.logical(showProgress)) {
-    stop(paste0("Argument 'showProgress' must be either 'TRUE' or 'FALSE."))
-  }
-  if (!is.logical(cache)) {
-    stop(paste0("Argument 'cache' must be either 'TRUE' or 'FALSE."))
-  }
+  requested_type <- rlang::arg_match(type, c("basica", "combinada"))
+  check_flag(showProgress, "showProgress")
+  check_flag(cache, "cache")
   check_input_date_format(date)
 
   ### get files available

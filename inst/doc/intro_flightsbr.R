@@ -42,3 +42,20 @@ knitr::opts_chunk$set(
 # 
 # head(airfares)
 
+## ----eval=FALSE---------------------------------------------------------------
+# # where are the cached files?
+# get_flightsbr_cache_dir()
+# 
+# # use another folder (this choice is kept across R sessions)
+# set_flightsbr_cache_dir("path/to/folder")
+# 
+# # go back to the default folder
+# set_flightsbr_cache_dir(NULL)
+# 
+# # list the cached files
+# list_flightsbr_cache()
+# 
+# # delete one cached file, or all of them
+# delete_flightsbr_cache("basica2015-06.zip")
+# delete_flightsbr_cache()
+

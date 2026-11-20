@@ -44,7 +44,7 @@ get_flights_files_available <- function(cache = TRUE) { # nocov start
   )
 
   if (inherits(resp, "try-error")) {
-    message("Problem connecting to ANAC data server. Please try it again.")
+    cli::cli_inform("Problem connecting to ANAC data server. Please try it again.")
     return(invisible(NULL))
   }
 
@@ -124,11 +124,22 @@ get_flights_files_available <- function(cache = TRUE) { # nocov start
 
   files <- data.table::rbindlist(files, fill = TRUE)
 
+  # no table with the expected columns, e.g. ANAC served a maintenance page
+  if (nrow(files) == 0 || !all(c("date", "type", "url") %in% names(files))) {
+    cli::cli_inform("Problem connecting to ANAC data server. Please try it again.")
+    return(invisible(NULL))
+  }
+
   files <- files[
     !is.na(date) &
       !is.na(url) &
       nzchar(url)
   ]
+
+  # ANAC lists relative hrefs that point to an HTML landing page; turn them
+  # into absolute urls that point to the zip file itself
+  page_url <- url
+  files[, url := normalize_anac_url(url, base = page_url)]
 
   files <- unique(files)
 
@@ -139,6 +150,73 @@ get_flights_files_available <- function(cache = TRUE) { # nocov start
 
   return(files)
 } # nocov end
+
+
+# normalize_anac_url --------------------------------------------------------------------------
+
+#' Turn an ANAC (gov.br) file href into a direct download url
+#'
+#' The flight file listing on gov.br links to each zip file through a relative
+#' href (e.g. `/anac/.../basica2020-04.zip`) that serves an HTML landing page.
+#' The zip file itself is served at `<href>/@@download/file`.
+#'
+#' @param href Character vector of hrefs, relative or absolute, with or
+#'        without the `/@@download/file` suffix.
+#' @param base String. Url of the page the hrefs were scraped from, used to
+#'        resolve relative hrefs.
+#'
+#' @return A character vector of absolute urls ending in `/@@download/file`.
+#' @keywords internal
+normalize_anac_url <- function(href, base) {
+
+  # resolve relative hrefs against the page url; absolute ones are kept as is
+  url <- rvest::url_absolute(href, base)
+
+  url <- ifelse(
+    grepl("/@@download/file$", url),
+    url,
+    paste0(sub("/+$", "", url), "/@@download/file")
+  )
+
+  return(url)
+}
+
+
+# anac_file_name ------------------------------------------------------------------------------
+
+#' Get the name of the file behind an ANAC download url
+#'
+#' @param file_url Character vector of urls, possibly ending in
+#'        `/@@download/file`.
+#'
+#' @return A character vector of file names (e.g. `"basica2020-04.zip"`).
+#' @keywords internal
+anac_file_name <- function(file_url) {
+  basename(sub("/@@download/file$", "", file_url))
+}
+
+
+# is_zip_file ---------------------------------------------------------------------------------
+
+#' Check whether local files are zip archives
+#'
+#' Reads the first two bytes of each file and checks for the zip signature
+#' `PK`. ANAC sometimes returns an HTML page with HTTP status 200 instead of
+#' the requested zip file.
+#'
+#' @param path Character vector of local file paths.
+#'
+#' @return A logical vector, `FALSE` for files that are missing, empty, or not
+#'         zip archives.
+#' @keywords internal
+is_zip_file <- function(path) {
+  vapply(path, function(p) {
+    if (!file.exists(p) || isTRUE(file.info(p)$size < 4)) {
+      return(FALSE)
+    }
+    identical(readBin(p, what = "raw", n = 2L), charToRaw("PK"))
+  }, logical(1), USE.NAMES = FALSE)
+}
 
 
 # get_flight_dates_available -----------------------------------------------------------------
@@ -213,83 +291,87 @@ download_flights_data <- function(file_url = parent.frame()$file_url,
                                   select = parent.frame()$select,
                                   cache = parent.frame()$cache){ # nocov start
 
-  # create temp local file
-  file_name <- basename(file_url)
-  temp_local_file <- fs::path(fs::path_temp(), file_name)
+  # create temp local file. The name comes from the url without its
+  # '/@@download/file' suffix, otherwise every month would be saved as 'file'
+  file_name <- anac_file_name(file_url)
+  temp_local_file <- fs::path(flightsbr_cache_dir(), file_name)
 
-  # use cached files or not
-  if (any(cache==FALSE & file.exists(temp_local_file))) {
-    unlink(temp_local_file, recursive = T)
-  }
+  # discard cached files that are not zip archives
+  bad_cache <- file.exists(temp_local_file) & !is_zip_file(temp_local_file)
+  unlink(temp_local_file[bad_cache])
 
-  # has the file been downloaded already? If not, download it
-  if (any(cache==FALSE |
-          !file.exists(temp_local_file) |
-          file.info(temp_local_file)$size == 0)) {
+  # download files that are not cached yet
+  check_download <- download_flightsbr_file(
+    file_url = file_url,
+    showProgress = showProgress,
+    dest_file = temp_local_file,
+    cache = cache
+    )
 
-    # download data
-    check_download <- download_flightsbr_file(
-      file_url=file_url,
-      showProgress=showProgress,
-      dest_file = temp_local_file,
-      cache = cache)
-
-  # check if internet connection worked
   if (is.null(check_download)) {
-    message("Problem connecting to ANAC data server. Please try it again.")
     return(invisible(NULL))
-    }
   }
 
+  # ANAC can answer with a web page instead of the zip file
+  not_zip <- !is_zip_file(temp_local_file)
+  if (any(not_zip)) {
+    unlink(temp_local_file[not_zip])
+    web_page <- file_name[not_zip]
+    cli::cli_inform(
+      "ANAC returned a web page instead of the data file for: {.file {web_page}}. Please try it again later."
+    )
+    return(invisible(NULL))
+  }
 
-  ### set threads for fread
-  orig_threads <- data.table::getDTthreads()
-  data.table::setDTthreads(percent = 100)
 
   ## unzip and fread
   unzip_and_fread <- function(single_temp_local_file,
                               showProgress = parent.frame()$showProgress,
                               select = parent.frame()$select){
 
-    # single_temp_local_file = temp_local_file[1]
+    # extract to a folder of its own, deleted after reading, so the large
+    # .txt files don't pile up in the temp dir
+    temp_local_dir <- tempfile(pattern = "flightsbr_")
+    on.exit(unlink(temp_local_dir, recursive = TRUE), add = TRUE)
 
-    # unzip file to tempdir
-    temp_local_dir <- fs::path_temp()
+    tryCatch({
+      archive::archive_extract(
+        archive = single_temp_local_file,
+        dir = temp_local_dir
+        )
 
-    #  utils::unzip(zipfile = single_temp_local_file, exdir = temp_local_dir)
-    archive::archive_extract(
-      archive = single_temp_local_file,
-      dir = temp_local_dir
-      )
+      txt_file <- list.files(temp_local_dir, full.names = TRUE, recursive = TRUE)
 
-
-    # get file name
-    file_name <- utils::unzip(single_temp_local_file, list = TRUE)$Name
-
-    # read file stored locally
-    temp_dt <- data.table::fread(fs::path(temp_local_dir, file_name),
-                                 select = select,
-                                 showProgress = showProgress,
-                                 colClasses = 'character',
-                                 sep = ';',
-                                 encoding = 'Latin-1')
-    return(temp_dt)
+      data.table::fread(txt_file[1],
+                        select = select,
+                        showProgress = showProgress,
+                        colClasses = 'character',
+                        sep = ';',
+                        encoding = 'Latin-1')
+      },
+      error = function(e) NULL
+    )
   }
 
-  message('Unziping and reading data to memory.')
   if (isTRUE(showProgress)) {
-    dt <- pbapply::pblapply(X=temp_local_file, FUN=unzip_and_fread,
-                            select = select,
-                            showProgress = showProgress)
-  } else {
-    dt <- lapply(X=temp_local_file, FUN=unzip_and_fread,
-                 select = select,
-                 showProgress = showProgress)
+    cli::cli_inform("Unzipping and reading data to memory.")
   }
+  dt <- lapply_progress(temp_local_file, unzip_and_fread,
+                        select = select,
+                        .progress = showProgress,
+                        .name = "Unzipping and reading files")
 
-
-  # return to original threads
-  data.table::setDTthreads(orig_threads)
+  # a corrupt zip can't be read: drop it from the cache so the next call
+  # downloads it again
+  failed <- vapply(dt, is.null, logical(1))
+  if (any(failed)) {
+    unlink(temp_local_file[failed])
+    unreadable <- file_name[failed]
+    cli::cli_inform(
+      "Could not read the data file for: {.file {unreadable}}. The cached copy was removed; please try it again."
+    )
+    return(invisible(NULL))
+  }
 
   return(dt)
 

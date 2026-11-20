@@ -16,12 +16,21 @@ or \code{c(2022, 2024)}.}
 \item{showProgress}{Logical. Defaults to \code{TRUE} display progress.}
 
 \item{cache}{Logical. Whether the function should read cached data downloaded
-previously. Defaults to \code{TRUE}. If \code{FALSE}, the function will
-always download the data and overwrite cached data.}
+previously. Defaults to \code{TRUE}. Downloaded files are cached
+in a folder that persists across R sessions (see
+\code{\link[=get_flightsbr_cache_dir]{get_flightsbr_cache_dir()}} and \code{\link[=set_flightsbr_cache_dir]{set_flightsbr_cache_dir()}}),
+and a cached file is downloaded again only if ANAC's copy has
+a different size. If \code{FALSE}, the function will always
+download the data and overwrite cached data. See
+\code{\link[=list_flightsbr_cache]{list_flightsbr_cache()}} and \code{\link[=delete_flightsbr_cache]{delete_flightsbr_cache()}} to
+manage cached files.}
 }
 \value{
-A \verb{"data.table" "data.frame"} object. All columns are returned with
-\code{class} of type \code{"character"}.
+A \verb{"data.table" "data.frame"} object. Columns of counts and
+measures are numeric; codes and identifiers (e.g. flight numbers,
+serial numbers, airport codes) are character, keeping leading
+zeros. A column with some values that are not numbers stays
+character, with a message.
 }
 \description{
 Download data of all aircraft registered in the Brazilian Aeronautical
@@ -32,7 +41,7 @@ data is available at \url{https://www.gov.br/anac/pt-br/sistemas/rab}.
 \examples{
 \dontrun{ if (interactive()) {
 # Read aircraft data
-aircraft <- read_aircraft(date = 202001,
+aircraft <- read_aircraft(date = 202409,
                           showProgress = TRUE
                           )
 

@@ -446,6 +446,31 @@ Brazil:</h4>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">head</span>(airfares)</span></code></pre></div>
 </div>
 </div>
+<div id="cached-data" class="section level2">
+<h2>Cached data</h2>
+<p><strong>flightsbr</strong> saves the files it downloads from ANAC in
+a cache folder on your computer. Each file is downloaded only once, even
+across R sessions: later calls read the local copy, and a file is
+downloaded again only if ANAC’s copy has changed size, or if you set
+<code>cache = FALSE</code>.</p>
+<p>You can check, change, list and delete the cached data with four
+functions:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># where are the cached files?</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">get_flightsbr_cache_dir</span>()</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># use another folder (this choice is kept across R sessions)</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">set_flightsbr_cache_dir</span>(<span class="st">&quot;path/to/folder&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># go back to the default folder</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="fu">set_flightsbr_cache_dir</span>(<span class="cn">NULL</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co"># list the cached files</span></span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="fu">list_flightsbr_cache</span>()</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co"># delete one cached file, or all of them</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="fu">delete_flightsbr_cache</span>(<span class="st">&quot;basica2015-06.zip&quot;</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="fu">delete_flightsbr_cache</span>()</span></code></pre></div>
+</div>
 
 
 

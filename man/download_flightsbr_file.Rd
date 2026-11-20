@@ -2,12 +2,12 @@
 % Please edit documentation in R/utils.R
 \name{download_flightsbr_file}
 \alias{download_flightsbr_file}
-\title{Download file from url}
+\title{Download files from urls, reusing cached copies}
 \usage{
 download_flightsbr_file(
   file_url = parent.frame()$file_url,
   showProgress = parent.frame()$showProgress,
-  dest_file = temp_local_file,
+  dest_file = fs::path(flightsbr_cache_dir(), basename(file_url)),
   cache = cache
 )
 }
@@ -16,15 +16,29 @@ download_flightsbr_file(
 
 \item{showProgress}{Logical, passed from above.}
 
-\item{dest_file}{String, passed from above.}
+\item{dest_file}{String. Local path(s) where the file(s) are saved, one per
+\code{file_url}. Defaults to the flightsbr cache directory (see
+\code{\link[=get_flightsbr_cache_dir]{get_flightsbr_cache_dir()}}) plus \code{basename(file_url)}.}
 
-\item{cache}{Logical, passed from above.}
+\item{cache}{Logical, passed from above. If \code{FALSE}, existing files at
+\code{dest_file} are deleted and downloaded again.}
 }
 \value{
-Silently saves downloaded file to temp dir.
+\code{TRUE} (invisibly) if every file is available locally, otherwise
+\code{NULL} (invisibly) with a message.
 }
 \description{
-Download file from url
+Downloads each file to a temporary \code{.part} file and only moves it to
+\code{dest_file} once the download succeeded and the content is not an HTML
+page. A failed or blocked request therefore never leaves a file at
+\code{dest_file}, so later calls with \code{cache = TRUE} cannot read an error page as
+data.
+}
+\details{
+With \code{cache = TRUE}, a file already at \code{dest_file} is reused unless the
+ANAC server reports a different size for it (checked with a HEAD request).
+If the size can't be checked (no connection, no size header, or ANAC
+answers with a web page), the cached file is reused.
 }
 \examples{
 \dontrun{ if (interactive()) {
